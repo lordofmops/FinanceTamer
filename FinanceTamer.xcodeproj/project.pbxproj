@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		159DE1892DFB1E6700955089 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 159DE1462DFAC70600955089 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 159DE14D2DFAC70600955089;
+			remoteInfo = FinanceTamer;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		159DE14E2DFAC70600955089 /* FinanceTamer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinanceTamer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		159DE1852DFB1E6700955089 /* FinanceTamerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinanceTamerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = FinanceTamer;
 			sourceTree = "<group>";
 		};
+		159DE1862DFB1E6700955089 /* FinanceTamerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FinanceTamerTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		159DE14B2DFAC70600955089 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		159DE1822DFB1E6700955089 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				159DE1502DFAC70600955089 /* FinanceTamer */,
+				159DE1862DFB1E6700955089 /* FinanceTamerTests */,
 				159DE14F2DFAC70600955089 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				159DE14E2DFAC70600955089 /* FinanceTamer.app */,
+				159DE1852DFB1E6700955089 /* FinanceTamerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = 159DE14E2DFAC70600955089 /* FinanceTamer.app */;
 			productType = "com.apple.product-type.application";
 		};
+		159DE1842DFB1E6700955089 /* FinanceTamerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 159DE18B2DFB1E6700955089 /* Build configuration list for PBXNativeTarget "FinanceTamerTests" */;
+			buildPhases = (
+				159DE1812DFB1E6700955089 /* Sources */,
+				159DE1822DFB1E6700955089 /* Frameworks */,
+				159DE1832DFB1E6700955089 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				159DE18A2DFB1E6700955089 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				159DE1862DFB1E6700955089 /* FinanceTamerTests */,
+			);
+			name = FinanceTamerTests;
+			packageProductDependencies = (
+			);
+			productName = FinanceTamerTests;
+			productReference = 159DE1852DFB1E6700955089 /* FinanceTamerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +130,11 @@
 				TargetAttributes = {
 					159DE14D2DFAC70600955089 = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					159DE1842DFB1E6700955089 = {
+						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1640;
+						TestTargetID = 159DE14D2DFAC70600955089;
 					};
 				};
 			};
@@ -100,12 +153,20 @@
 			projectRoot = "";
 			targets = (
 				159DE14D2DFAC70600955089 /* FinanceTamer */,
+				159DE1842DFB1E6700955089 /* FinanceTamerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		159DE14C2DFAC70600955089 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		159DE1832DFB1E6700955089 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +183,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		159DE1812DFB1E6700955089 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		159DE18A2DFB1E6700955089 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 159DE14D2DFAC70600955089 /* FinanceTamer */;
+			targetProxy = 159DE1892DFB1E6700955089 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		159DE1572DFAC70600955089 /* Debug */ = {
@@ -302,6 +378,47 @@
 			};
 			name = Release;
 		};
+		159DE18C2DFB1E6700955089 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GWV92276SN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.lordofmops.FinanceTamerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FinanceTamer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FinanceTamer";
+			};
+			name = Debug;
+		};
+		159DE18D2DFB1E6700955089 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = GWV92276SN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ru.lordofmops.FinanceTamerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FinanceTamer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FinanceTamer";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -319,6 +436,15 @@
 			buildConfigurations = (
 				159DE15A2DFAC70600955089 /* Debug */,
 				159DE15B2DFAC70600955089 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		159DE18B2DFB1E6700955089 /* Build configuration list for PBXNativeTarget "FinanceTamerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				159DE18C2DFB1E6700955089 /* Debug */,
+				159DE18D2DFB1E6700955089 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
