@@ -11,7 +11,11 @@ import SwiftUI
 struct FinanceTamerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabBarView()
         }
     }
+}
+
+#Preview {
+    TabBarView()
 }
