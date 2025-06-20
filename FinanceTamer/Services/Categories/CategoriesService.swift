@@ -15,4 +15,11 @@ final class CategoriesService {
     func categories(direction: Direction) async throws -> [Category] {
         categories.filter { $0.direction == direction }
     }
+    
+    func category(for transaction: Transaction) async throws -> Category {
+        guard let category = categories.first(where: { $0.id == transaction.categoryId }) else {
+            throw NSError(domain: "CategoriesService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid category id"])
+        }
+        return category
+    }
 }

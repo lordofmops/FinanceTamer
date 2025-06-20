@@ -1,0 +1,155 @@
+//
+//  TransactionHistoryView.swift
+//  FinanceTamer
+//
+//  Created by Дарья Дробышева on 20.06.2025.
+//
+
+import SwiftUI
+
+struct TransactionHistoryView: View {
+    @Environment(\.dismiss) var dismiss
+    let direction: Direction
+    @StateObject private var viewModel: TransactionHistoryViewModel
+    @State private var sortOption: SortOption = .date
+
+    init(direction: Direction) {
+        self.direction = direction
+        _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction))
+    }
+    
+    enum SortOption: String, CaseIterable {
+        case date = "По дате"
+        case amount = "По сумме"
+        
+        var icon: String {
+            switch self {
+            case .date: return "calendar"
+            case .amount: return "rublesign"
+            }
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Моя история")
+                .padding(.horizontal, 16)
+                .font(.system(size: 34, weight: .bold))
+            
+            List {
+                Section {
+                    HStack {
+                        Text("Начало")
+                        Spacer()
+                        CustomDatePicker(date: $viewModel.dateFrom)
+                    }
+                    .onChange(of: viewModel.dateFrom) { oldValue, newValue in
+                        if newValue > viewModel.dateTo {
+                            viewModel.dateTo = newValue
+                        }
+                        if oldValue != newValue {
+                            Task {
+                                await viewModel.load()
+                            }
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Конец")
+                        Spacer()
+                        CustomDatePicker(date: $viewModel.dateTo)
+                        
+                    }
+                    .onChange(of: viewModel.dateTo) { oldValue, newValue in
+                        if newValue < viewModel.dateFrom {
+                            viewModel.dateFrom = newValue
+                        }
+                        if oldValue != newValue {
+                            Task {
+                                await viewModel.load()
+                            }
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Сортировка")
+                            .font(.system(size: 17, weight: .regular))
+                        
+                        Spacer()
+                        
+                        Menu {
+                            Picker(selection: $sortOption, label: EmptyView()) {
+                                ForEach(SortOption.allCases, id: \.self) { option in
+                                    Label(option.rawValue, systemImage: option.icon).tag(option)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(sortOption.rawValue)
+                                    .font(.system(size: 17, weight: .regular))
+                                    .foregroundColor(.black)
+                                
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 14))
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.datePicker)
+                            .cornerRadius(6)
+                        }
+                        .onChange(of: sortOption) { _, newOption in
+                            viewModel.sortTransactions(by: newOption)
+                        }
+                    }
+                    
+                    HStack {
+                        Text("Сумма")
+                            .font(.system(size: 17, weight: .regular))
+                        Spacer()
+                        Text("\(viewModel.total.formatted()) ₽")
+                            .font(.system(size: 17, weight: .regular))
+                    }
+                    
+                }
+                
+                Section(header: Text("Операции")) {
+                    if viewModel.extendedTransactions.isEmpty {
+                        Text("Нет операций")
+                            .font(.headline)
+                    } else {
+                        ForEach(viewModel.extendedTransactions) { transaction in
+                            TransactionRowView(extendedTransaction: transaction)
+                        }
+                    }
+                }
+            }
+        }
+        .background(Color.background)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                        Text("Назад")
+                    }
+                    .foregroundColor(.navigationBar)
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    // анализ
+                }) {
+                    Image(systemName: "document")
+                        .foregroundColor(.navigationBar)
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    TransactionHistoryView(direction: .outcome)
+}
