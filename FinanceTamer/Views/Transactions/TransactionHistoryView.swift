@@ -11,10 +11,23 @@ struct TransactionHistoryView: View {
     @Environment(\.dismiss) var dismiss
     let direction: Direction
     @StateObject private var viewModel: TransactionHistoryViewModel
+    @State private var sortOption: SortOption = .date
 
     init(direction: Direction) {
         self.direction = direction
         _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction))
+    }
+    
+    enum SortOption: String, CaseIterable {
+        case date = "По дате"
+        case amount = "По сумме"
+        
+        var icon: String {
+            switch self {
+            case .date: return "calendar"
+            case .amount: return "rublesign"
+            }
+        }
     }
 
     var body: some View {
@@ -59,12 +72,44 @@ struct TransactionHistoryView: View {
                     }
                     
                     HStack {
+                        Text("Сортировка")
+                            .font(.system(size: 17, weight: .regular))
+                        
+                        Spacer()
+                        
+                        Menu {
+                            Picker(selection: $sortOption, label: EmptyView()) {
+                                ForEach(SortOption.allCases, id: \.self) { option in
+                                    Label(option.rawValue, systemImage: option.icon).tag(option)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(sortOption.rawValue)
+                                    .font(.system(size: 17, weight: .regular))
+                                    .foregroundColor(.black)
+                                
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 14))
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.datePicker)
+                            .cornerRadius(6)
+                        }
+                        .onChange(of: sortOption) { _, newOption in
+                            viewModel.sortTransactions(by: newOption)
+                        }
+                    }
+                    
+                    HStack {
                         Text("Сумма")
                             .font(.system(size: 17, weight: .regular))
                         Spacer()
                         Text("\(viewModel.total.formatted()) ₽")
                             .font(.system(size: 17, weight: .regular))
                     }
+                    
                 }
                 
                 Section(header: Text("Операции")) {

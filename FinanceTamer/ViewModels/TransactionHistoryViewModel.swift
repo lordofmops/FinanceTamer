@@ -40,6 +40,15 @@ final class TransactionHistoryViewModel: ObservableObject {
             await self?.load()
         }
     }
+    
+    func sortTransactions(by option: TransactionHistoryView.SortOption) {
+        switch option {
+        case .date:
+            extendedTransactions.sort { $0.transaction.date > $1.transaction.date }
+        case .amount:
+            extendedTransactions.sort { abs($0.transaction.amount) > abs($1.transaction.amount) }
+        }
+    }
 
     func load() async {
         do {
@@ -55,7 +64,6 @@ final class TransactionHistoryViewModel: ObservableObject {
             
             let extended = loadedTransactions
                 .reduce(into: [ExtendedTransaction]()) { result, transaction in
-                    print(transaction.id)
                     guard let category = categoriesDict[transaction.categoryId],
                           category.direction == direction else { return }
                     
@@ -69,6 +77,7 @@ final class TransactionHistoryViewModel: ObservableObject {
             await MainActor.run {
                 self.extendedTransactions = extended
                 self.total = total
+                sortTransactions(by: .date)
             }
             
         } catch {
