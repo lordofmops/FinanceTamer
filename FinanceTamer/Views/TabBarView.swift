@@ -10,14 +10,14 @@ import SwiftUI
 struct TabBarView: View {
     var body: some View {
         TabView {
-            ExpensesView()
+            TransactionsListView(direction: .outcome)
                 .tabItem {
                     Image("expenses")
                         .renderingMode(.template)
                     Text("Расходы")
                 }
 
-            IncomesView()
+            TransactionsListView(direction: .income)
                 .tabItem {
                     Image("incomes")
                         .renderingMode(.template)
