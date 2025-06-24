@@ -32,12 +32,20 @@ struct TransactionHistoryView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Моя история")
-                .padding(.horizontal, 16)
-                .font(.system(size: 34, weight: .bold))
+//            Text("Моя история")
+//                .padding(.horizontal, 16)
+//                .padding(.bottom, -12)
+//                .font(.system(size: 34, weight: .bold))
             
             List {
-                Section {
+                Section(header:
+                    Text("Моя история")
+                        .padding(.horizontal, -18)
+//                        .padding(.bottom, -12)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.black)
+                        .textCase(nil)
+                ) {
                     HStack {
                         Text("Начало")
                         Spacer()
@@ -58,7 +66,6 @@ struct TransactionHistoryView: View {
                         Text("Конец")
                         Spacer()
                         CustomDatePicker(date: $viewModel.dateTo)
-                        
                     }
                     .onChange(of: viewModel.dateTo) { oldValue, newValue in
                         if newValue < viewModel.dateFrom {
@@ -73,10 +80,7 @@ struct TransactionHistoryView: View {
                     
                     HStack {
                         Text("Сортировка")
-                            .font(.system(size: 17, weight: .regular))
-                        
                         Spacer()
-                        
                         Menu {
                             Picker(selection: $sortOption, label: EmptyView()) {
                                 ForEach(SortOption.allCases, id: \.self) { option in
@@ -86,14 +90,14 @@ struct TransactionHistoryView: View {
                         } label: {
                             HStack {
                                 Text(sortOption.rawValue)
-                                    .font(.system(size: 17, weight: .regular))
                                     .foregroundColor(.black)
                                 
                                 Image(systemName: "chevron.down")
                                     .font(.system(size: 14))
+                                    .foregroundColor(.black)
                             }
+                            .frame(height: 34)
                             .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
                             .background(.datePicker)
                             .cornerRadius(6)
                         }
@@ -121,6 +125,12 @@ struct TransactionHistoryView: View {
                             TransactionRowView(extendedTransaction: transaction)
                         }
                     }
+                }
+            }
+            .listSectionSpacing(0)
+            .refreshable {
+                Task {
+                    await viewModel.load()
                 }
             }
         }
@@ -151,5 +161,6 @@ struct TransactionHistoryView: View {
 }
 
 #Preview {
-    TransactionHistoryView(direction: .outcome)
+//    TransactionHistoryView(direction: .outcome)
+    TabBarView()
 }

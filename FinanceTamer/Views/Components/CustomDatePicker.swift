@@ -22,13 +22,14 @@ struct CustomDatePicker: View {
         .padding(.horizontal, 12)
         .foregroundColor(.black)
         .background(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 6)
                 .foregroundColor(.datePicker)
-                .padding(.vertical, -8)
+                .frame(height: 34)
         )
         .overlay(
             DatePicker("", selection: $date, displayedComponents: .date)
                 .labelsHidden()
+                .environment(\.locale, Locale.init(identifier: "ru"))
                 .colorMultiply(.clear)
         )
     }
