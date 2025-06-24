@@ -9,35 +9,43 @@ import SwiftUI
 
 struct TransactionHistoryView: View {
     @Environment(\.dismiss) var dismiss
-    let direction: Direction
+    
     @StateObject private var viewModel: TransactionHistoryViewModel
-    @State private var sortOption: SortOption = .date
+    @State private var sortOption: SortOption = .date_desc
+    let direction: Direction
 
     init(direction: Direction) {
         self.direction = direction
-        _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction))
+        _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction)
+        )
     }
     
     enum SortOption: String, CaseIterable {
-        case date = "По дате"
-        case amount = "По сумме"
+        case date_desc = "Новые"
+        case date_asc = "Старые"
+        case amount_desc = "Дороже"
+        case amount_asc = "Дешевле"
         
         var icon: String {
             switch self {
-            case .date: return "calendar"
-            case .amount: return "rublesign"
+            case .date_desc: return "calendar.circle"
+            case .date_asc: return "calendar.circle.fill"
+            case .amount_desc: return "rublesign.circle"
+            case .amount_asc: return "rublesign.circle.fill"
             }
         }
     }
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Моя история")
-                .padding(.horizontal, 16)
-                .font(.system(size: 34, weight: .bold))
-            
             List {
-                Section {
+                Section(header:
+                    Text("Моя история")
+                        .padding(.horizontal, -18)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.black)
+                        .textCase(nil)
+                ) {
                     HStack {
                         Text("Начало")
                         Spacer()
@@ -58,7 +66,6 @@ struct TransactionHistoryView: View {
                         Text("Конец")
                         Spacer()
                         CustomDatePicker(date: $viewModel.dateTo)
-                        
                     }
                     .onChange(of: viewModel.dateTo) { oldValue, newValue in
                         if newValue < viewModel.dateFrom {
@@ -73,11 +80,10 @@ struct TransactionHistoryView: View {
                     
                     HStack {
                         Text("Сортировка")
-                            .font(.system(size: 17, weight: .regular))
-                        
                         Spacer()
-                        
                         Menu {
+                            Text("Показывать сначала")
+                            
                             Picker(selection: $sortOption, label: EmptyView()) {
                                 ForEach(SortOption.allCases, id: \.self) { option in
                                     Label(option.rawValue, systemImage: option.icon).tag(option)
@@ -86,14 +92,14 @@ struct TransactionHistoryView: View {
                         } label: {
                             HStack {
                                 Text(sortOption.rawValue)
-                                    .font(.system(size: 17, weight: .regular))
                                     .foregroundColor(.black)
                                 
                                 Image(systemName: "chevron.down")
                                     .font(.system(size: 14))
+                                    .foregroundColor(.black)
                             }
+                            .frame(height: 34)
                             .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
                             .background(.datePicker)
                             .cornerRadius(6)
                         }
@@ -112,7 +118,10 @@ struct TransactionHistoryView: View {
                     
                 }
                 
-                Section(header: Text("Операции")) {
+                Section(header:
+                    Text("Операции")
+                        .padding(.horizontal, -18)
+                ) {
                     if viewModel.extendedTransactions.isEmpty {
                         Text("Нет операций")
                             .font(.headline)
@@ -121,6 +130,13 @@ struct TransactionHistoryView: View {
                             TransactionRowView(extendedTransaction: transaction)
                         }
                     }
+                }
+            }
+            .padding(.top, -20)
+            .listSectionSpacing(0)
+            .refreshable {
+                Task {
+                    await viewModel.load()
                 }
             }
         }
@@ -152,4 +168,5 @@ struct TransactionHistoryView: View {
 
 #Preview {
     TransactionHistoryView(direction: .outcome)
+//    TabBarView()
 }

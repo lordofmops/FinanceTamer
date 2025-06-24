@@ -24,19 +24,7 @@ struct TransactionsListView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Spacer()
-                    NavigationLink(value: MyRoute.transactionHistory(direction)) {
-                        Image("history_button")
-                    }
-                    .padding(.horizontal, 16)
-                }
-                
-                Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
-                    .padding(.horizontal, 16)
-                    .font(.system(size: 34, weight: .bold))
-                
+            VStack(alignment: .leading) {
                 List {
                     Section {
                         HStack {
@@ -47,6 +35,7 @@ struct TransactionsListView: View {
                                 .font(.system(size: 17, weight: .regular))
                         }
                     }
+                    
                     Section(header: Text("Операции")) {
                         if viewModel.extendedTransactions.isEmpty {
                             Text("Нет операций")
@@ -61,6 +50,7 @@ struct TransactionsListView: View {
                 .refreshable {
                     await viewModel.load()
                 }
+                .listSectionSpacing(12)
                 
                 Spacer()
                 
@@ -80,10 +70,20 @@ struct TransactionsListView: View {
                 await viewModel.load()
             }
             .background(Color.background)
+            .navigationTitle(
+                Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
+            )
             .navigationDestination(for: MyRoute.self) { route in
                 switch route {
                 case .transactionHistory(let direction):
                     TransactionHistoryView(direction: direction)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(value: MyRoute.transactionHistory(direction)) {
+                        Image("history_button")
+                    }
                 }
             }
         }

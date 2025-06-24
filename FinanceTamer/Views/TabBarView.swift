@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct TabBarView: View {
+    
+    init() {
+        UITabBar.appearance().backgroundColor = .white
+    }
+    
     var body: some View {
         TabView {
             TransactionsListView(direction: .outcome)
