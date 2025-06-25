@@ -17,7 +17,7 @@ struct TransactionRowView: View {
             Text(String(extendedTransaction.category.emoji))
                 .font(.system(size: 14.5))
                 .frame(width: 22, height: 22)
-                .background(Color.emojiBackground)
+                .background(Color.lightGreen)
                 .clipShape(Circle())
 
             VStack(alignment: .leading) {
