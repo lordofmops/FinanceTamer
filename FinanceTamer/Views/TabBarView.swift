@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct TabBarView: View {
-    
     init() {
         UITabBar.appearance().backgroundColor = .white
     }
@@ -51,7 +50,17 @@ struct TabBarView: View {
                 }
         }
         .tint(.accentColor)
+        .background(
+            ShakeDetector {
+                print("Shake detected!")
+                NotificationCenter.default.post(name: .shakeGesture, object: nil)
+            }
+        )
     }
+}
+
+extension Notification.Name {
+    static let shakeGesture = Notification.Name("shakeGesture")
 }
 
 #Preview {

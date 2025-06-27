@@ -100,7 +100,7 @@ struct TransactionHistoryView: View {
                             }
                             .frame(height: 34)
                             .padding(.horizontal, 12)
-                            .background(.datePicker)
+                            .background(Color.lightGreen)
                             .cornerRadius(6)
                         }
                         .onChange(of: sortOption) { _, newOption in
@@ -151,7 +151,7 @@ struct TransactionHistoryView: View {
                         Image(systemName: "chevron.left")
                         Text("Назад")
                     }
-                    .foregroundColor(.navigationBar)
+                    .foregroundColor(.lightPurple)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -159,7 +159,7 @@ struct TransactionHistoryView: View {
                     // анализ
                 }) {
                     Image(systemName: "document")
-                        .foregroundColor(.navigationBar)
+                        .foregroundColor(.lightPurple)
                 }
             }
         }
