@@ -13,6 +13,7 @@ struct BankAccountView: View {
     @State private var isEditing: Bool = false
     @State private var path = NavigationPath()
     @State private var showCurrencyPicker: Bool = false
+    @State private var isBalanceHidden: Bool = false
     
     @FocusState private var isBalanceFocused: Bool
     
@@ -43,7 +44,7 @@ struct BankAccountView: View {
                             
                             if !isEditing {
                                 ZStack {
-                                    if viewModel.isBalanceHidden {
+                                    if isBalanceHidden {
                                         RoundedRectangle(cornerRadius: 4)
                                             .fill(Color.black.opacity(0.08))
                                             .frame(width: 73, height: 20)
@@ -56,7 +57,7 @@ struct BankAccountView: View {
                                     }
                                 }
                                 .frame(height: 20)
-                                .animation(.easeInOut(duration: 0.3), value: viewModel.isBalanceHidden)
+                                .animation(.easeInOut(duration: 0.3), value: isBalanceHidden)
                             } else {
                                 TextField("Введите сумму", text: $viewModel.balanceString)
                                 .keyboardType(.numbersAndPunctuation)
@@ -105,10 +106,6 @@ struct BankAccountView: View {
                     }
                 }
             }
-            .onChange(of: viewModel.isBalanceHidden) { _ in
-                withAnimation(.easeInOut(duration: 0.3)) {
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if isEditing {
@@ -129,6 +126,7 @@ struct BankAccountView: View {
                     } else {
                         Button(action: {
                             isEditing = true
+                            isBalanceHidden = false
                         }) {
                             HStack {
                                 Text("Редактировать")
@@ -150,7 +148,11 @@ struct BankAccountView: View {
             
         }
         .onReceive(NotificationCenter.default.publisher(for: .shakeGesture)) { _ in
-            viewModel.toggleBalanceVisibility()
+            if !isEditing {
+                withAnimation {
+                    isBalanceHidden.toggle()
+                }
+            }
         }
     }
 }

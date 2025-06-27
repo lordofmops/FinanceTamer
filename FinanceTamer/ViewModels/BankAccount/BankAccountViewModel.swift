@@ -7,8 +7,6 @@
 
 import Foundation
 import Combine
-import CoreHaptics
-import UIKit
 
 final class BankAccountViewModel: ObservableObject {
     @Published var bankAccount: BankAccount?
@@ -21,7 +19,6 @@ final class BankAccountViewModel: ObservableObject {
         }
     }
     @Published var selectedCurrency: Currency = .ruble
-    @Published var isBalanceHidden: Bool = false
     let availableCurrencies: [Currency] = [.ruble, .dollar, .euro]
     
     private let bankAccountsService = BankAccountsService()
@@ -85,14 +82,5 @@ final class BankAccountViewModel: ObservableObject {
         } catch {
             print("Error saving changes: \(error)")
         }
-    }
-    
-    func toggleBalanceVisibility() {
-        if CHHapticEngine.capabilitiesForHardware().supportsHaptics {
-            let generator = UINotificationFeedbackGenerator()
-            generator.notificationOccurred(.success)
-        }
-        
-        isBalanceHidden.toggle()
     }
 }
