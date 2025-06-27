@@ -27,6 +27,11 @@ struct ShakeDetector: UIViewControllerRepresentable {
             super.init(nibName: nil, bundle: nil)
             becomeFirstResponder()
         }
+        
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            becomeFirstResponder()
+        }
 
         required init?(coder: NSCoder) { fatalError() }
 

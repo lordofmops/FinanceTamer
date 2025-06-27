@@ -46,7 +46,7 @@ struct BankAccountView: View {
                                     if viewModel.isBalanceHidden {
                                         RoundedRectangle(cornerRadius: 4)
                                             .fill(Color.black.opacity(0.08))
-                                            .frame(height: 20)
+                                            .frame(width: 73, height: 20)
                                             .blur(radius: 3)
                                             .transition(.opacity)
                                     } else {
@@ -115,10 +115,11 @@ struct BankAccountView: View {
                         Button(action: {
                             Task {
                                 await viewModel.saveChanges()
+                                isEditing = false
+                                isBalanceFocused = false
+                                showCurrencyPicker = false
                             }
-                            isEditing = false
-                            isBalanceFocused = false
-                            showCurrencyPicker = false
+                            
                         }) {
                             HStack {
                                 Text("Сохранить")

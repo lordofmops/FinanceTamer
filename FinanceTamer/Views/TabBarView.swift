@@ -52,7 +52,6 @@ struct TabBarView: View {
         .tint(.accentColor)
         .background(
             ShakeDetector {
-                print("Shake detected!")
                 NotificationCenter.default.post(name: .shakeGesture, object: nil)
             }
         )

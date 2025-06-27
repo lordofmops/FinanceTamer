@@ -7,6 +7,8 @@
 
 import Foundation
 import Combine
+import CoreHaptics
+import UIKit
 
 final class BankAccountViewModel: ObservableObject {
     @Published var bankAccount: BankAccount?
@@ -86,6 +88,11 @@ final class BankAccountViewModel: ObservableObject {
     }
     
     func toggleBalanceVisibility() {
+        if CHHapticEngine.capabilitiesForHardware().supportsHaptics {
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+        }
+        
         isBalanceHidden.toggle()
     }
 }
