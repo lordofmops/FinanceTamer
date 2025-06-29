@@ -26,7 +26,14 @@ struct TransactionsListView: View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading) {
                 List {
-                    Section {
+                    Section(header:
+                        Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
+                            .padding(.horizontal, -18)
+                            .padding(.bottom, 20)
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(.black)
+                            .textCase(nil)
+                    ) {
                         HStack {
                             Text("Всего")
                                 .font(.system(size: 17, weight: .regular))
@@ -70,9 +77,6 @@ struct TransactionsListView: View {
                 await viewModel.load()
             }
             .background(Color.background)
-            .navigationTitle(
-                Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
-            )
             .navigationDestination(for: MyRoute.self) { route in
                 switch route {
                 case .transactionHistory(let direction):

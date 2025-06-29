@@ -23,7 +23,7 @@ struct CustomDatePicker: View {
         .foregroundColor(.black)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .foregroundColor(.datePicker)
+                .foregroundColor(.lightGreen)
                 .frame(height: 34)
         )
         .overlay(
