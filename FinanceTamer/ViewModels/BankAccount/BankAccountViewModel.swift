@@ -23,11 +23,7 @@ final class BankAccountViewModel: ObservableObject {
     
     private let bankAccountsService = BankAccountsService()
     
-    init() {
-        Task { [weak self] in
-            await self?.load()
-        }
-    }
+    init() {}
 
     func load() async {
         do {

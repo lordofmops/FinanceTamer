@@ -7,10 +7,12 @@
 
 import Foundation
 
-enum Currency: String, CaseIterable {
+enum Currency: String, CaseIterable, Identifiable {
     case ruble = "RUB"
     case dollar = "USD"
     case euro = "EUR"
+    
+    var id: UUID { UUID() }
     
     var code: String { rawValue }
     

@@ -30,7 +30,7 @@ struct BankAccountView: View {
                             .padding(.horizontal, -18)
                             .padding(.bottom, 20)
                             .font(.system(size: 34, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.header)
                             .textCase(nil)
                     ) {
                         HStack {
@@ -39,6 +39,7 @@ struct BankAccountView: View {
                             
                             Text("Баланс")
                                 .font(.system(size: 17))
+                                .foregroundColor(.black)
                             
                             Spacer()
                             
@@ -53,6 +54,7 @@ struct BankAccountView: View {
                                     } else {
                                         Text("\(viewModel.balanceString) \(viewModel.selectedCurrency.symbol)")
                                             .font(.system(size: 17, weight: .regular))
+                                            .foregroundColor(.black)
                                             .transition(.opacity)
                                     }
                                 }
@@ -74,11 +76,13 @@ struct BankAccountView: View {
                         HStack {
                             Text("Валюта")
                                 .font(.system(size: 17))
+                                .foregroundColor(.black)
                             
                             Spacer()
                             
                             Text(viewModel.selectedCurrency.symbol)
                                 .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.black)
                         }
                         .onTapGesture {
                             if isEditing {
@@ -146,6 +150,9 @@ struct BankAccountView: View {
                 .presentationBackground(.clear)
             }
             
+        }
+        .task {
+            await viewModel.load()
         }
         .onReceive(NotificationCenter.default.publisher(for: .shakeGesture)) { _ in
             if !isEditing {

@@ -43,7 +43,7 @@ struct TransactionHistoryView: View {
                     Text("Моя история")
                         .padding(.horizontal, -18)
                         .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.header)
                         .textCase(nil)
                 ) {
                     HStack {

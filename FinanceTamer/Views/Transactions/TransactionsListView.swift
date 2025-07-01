@@ -31,7 +31,7 @@ struct TransactionsListView: View {
                             .padding(.horizontal, -18)
                             .padding(.bottom, 20)
                             .font(.system(size: 34, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.header)
                             .textCase(nil)
                     ) {
                         HStack {

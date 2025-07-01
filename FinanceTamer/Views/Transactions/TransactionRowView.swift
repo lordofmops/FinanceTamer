@@ -42,10 +42,9 @@ struct TransactionRowView: View {
             }
             .frame(width: 16, height: 36)
         }
-        .background(.white)
     }
 }
 
 #Preview {
-    TransactionsListView(direction: .outcome)
+    TransactionHistoryView(direction: .outcome)
 }
