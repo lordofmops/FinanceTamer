@@ -19,7 +19,7 @@ struct CategoriesListView: View {
             VStack(alignment: .leading) {
                 List {
                     Section(header: Text("Расходы")) {
-                        if viewModel.categories.isEmpty {
+                        if viewModel.expenseCategories.isEmpty {
                             Text("Нет статей")
                         } else {
                             ForEach(viewModel.filteredCategories(direction: .outcome)) { category in
@@ -29,7 +29,7 @@ struct CategoriesListView: View {
                     }
                     
                     Section(header: Text("Доходы")) {
-                        if viewModel.categories.isEmpty {
+                        if viewModel.incomeCategories.isEmpty {
                             Text("Нет статей")
                         } else {
                             ForEach(viewModel.filteredCategories(direction: .income)) { category in
@@ -45,46 +45,6 @@ struct CategoriesListView: View {
             .task {
                 await viewModel.load()
             }
-        }
-    }
-    
-    private var searchBar: some View {
-        HStack {
-            TextField("",
-                      text: $viewModel.searchQuery,
-                      prompt: Text("Search").foregroundColor(.darkGray)
-            )
-                .padding(8)
-                .padding(.horizontal, 25)
-                .background(Color.lightGray)
-                .cornerRadius(8)
-                .overlay(
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.darkGray)
-                            .frame(minWidth: 25, maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 8)
-                        
-                        if viewModel.searchQuery.isEmpty {
-                            Button(action: {
-                                // голосовой ввод??
-                            }) {
-                                Image(systemName: "microphone.fill")
-                                    .foregroundColor(.darkGray)
-                                    .frame(minWidth: 25, maxWidth: .infinity, alignment: .trailing)
-                                    .padding(.trailing, 8)
-                            }
-                        } else {
-                            Button(action: {
-                                viewModel.searchQuery = ""
-                            }) {
-                                Image(systemName: "multiply.circle.fill")
-                                    .foregroundColor(.darkGray)
-                                    .padding(.trailing, 8)
-                            }
-                        }
-                    }
-                )
         }
     }
     

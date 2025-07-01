@@ -7,22 +7,11 @@
 import Foundation
 
 final class CategoriesViewModel: ObservableObject {
-    @Published var categories: [Category] = []
     @Published var incomeCategories: [Category] = []
     @Published var expenseCategories: [Category] = []
     @Published var searchQuery: String = ""
     
     private let categoriesService = CategoriesService()
-    
-    var filteredCategories: [Category] {
-        guard !searchQuery.isEmpty else {
-            return categories
-        }
-        
-        return categories.filter { category in
-            category.name.fuzzyMatch(searchQuery)
-        }
-    }
     
     func load() async {
         do {
@@ -32,7 +21,6 @@ final class CategoriesViewModel: ObservableObject {
             let (allExpenseCategories, allIncomeCategories) = try await (expenseCategories, incomeCategories)
             
             await MainActor.run {
-                self.categories = allIncomeCategories + allExpenseCategories
                 self.incomeCategories = allIncomeCategories
                 self.expenseCategories = allExpenseCategories
             }
