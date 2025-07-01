@@ -17,29 +17,30 @@ struct CategoriesListView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
-                Text("Мои статьи")
-                    .padding()
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundColor(.header)
-                    .textCase(nil)
-                
-                searchBar
-                    .frame(height: 36)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, -8)
-                
                 List {
-                    Section(header: Text("Статьи")) {
+                    Section(header: Text("Расходы")) {
                         if viewModel.categories.isEmpty {
                             Text("Нет статей")
                         } else {
-                            ForEach(viewModel.filteredCategories) { category in
+                            ForEach(viewModel.filteredCategories(direction: .outcome)) { category in
+                                categoryRow(for: category)
+                            }
+                        }
+                    }
+                    
+                    Section(header: Text("Доходы")) {
+                        if viewModel.categories.isEmpty {
+                            Text("Нет статей")
+                        } else {
+                            ForEach(viewModel.filteredCategories(direction: .income)) { category in
                                 categoryRow(for: category)
                             }
                         }
                     }
                 }
+                .searchable(text: $viewModel.searchQuery)
             }
+            .navigationTitle("Мои статьи")
             .background(Color.background)
             .task {
                 await viewModel.load()

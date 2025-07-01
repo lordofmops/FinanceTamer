@@ -8,6 +8,8 @@ import Foundation
 
 final class CategoriesViewModel: ObservableObject {
     @Published var categories: [Category] = []
+    @Published var incomeCategories: [Category] = []
+    @Published var expenseCategories: [Category] = []
     @Published var searchQuery: String = ""
     
     private let categoriesService = CategoriesService()
@@ -24,16 +26,42 @@ final class CategoriesViewModel: ObservableObject {
     
     func load() async {
         do {
-            let categories = try await categoriesService.categories()
+            async let expenseCategories = categoriesService.categories(direction: .outcome)
+            async let incomeCategories = categoriesService.categories(direction: .income)
+            
+            let (allExpenseCategories, allIncomeCategories) = try await (expenseCategories, incomeCategories)
             
             await MainActor.run {
-                self.categories = categories
+                self.categories = allIncomeCategories + allExpenseCategories
+                self.incomeCategories = allIncomeCategories
+                self.expenseCategories = allExpenseCategories
             }
         } catch {
             print("Error loading categories: \(error)")
         }
     }
     
+    func filteredCategories(direction: Direction) -> [Category] {
+        guard !searchQuery.isEmpty else {
+            switch direction {
+            case .income:
+                return incomeCategories
+            case .outcome:
+                return expenseCategories
+            }
+        }
+        
+        switch direction {
+        case .income:
+            return incomeCategories.filter { category in
+                category.name.fuzzyMatch(searchQuery)
+            }
+        case .outcome:
+            return expenseCategories.filter { category in
+                category.name.fuzzyMatch(searchQuery)
+            }
+        }
+    }
 }
 
 extension String {
