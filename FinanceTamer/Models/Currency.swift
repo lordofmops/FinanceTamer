@@ -7,13 +7,36 @@
 
 import Foundation
 
-struct Currency: Identifiable, Equatable {
-    let id = UUID()
-    let code: String
-    let symbol: String
-    let name: String
+enum Currency: String, CaseIterable {
+    case ruble = "RUB"
+    case dollar = "USD"
+    case euro = "EUR"
     
-    static let ruble = Currency(code: "RUB", symbol: "₽", name: "Российский рубль ₽")
-    static let dollar = Currency(code: "USD", symbol: "$", name: "Американский доллар $")
-    static let euro = Currency(code: "EUR", symbol: "€", name: "Евро €")
+    var code: String { rawValue }
+    
+    var symbol: String {
+        switch self {
+        case .ruble:
+            return "₽"
+        case .dollar:
+            return "$"
+        case .euro:
+            return "€"
+        }
+    }
+    
+    var name: String {
+        switch self {
+        case .ruble:
+            return "Российский рубль ₽"
+        case .dollar:
+            return "Американский доллар $"
+        case .euro:
+            return "Евро €"
+        }
+    }
+    
+    static var allCases: [Currency] {
+        return [.ruble, .dollar, .euro]
+    }
 }
