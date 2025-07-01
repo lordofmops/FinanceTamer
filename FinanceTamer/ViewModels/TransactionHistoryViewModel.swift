@@ -15,13 +15,15 @@ final class TransactionHistoryViewModel: ObservableObject {
     @Published var total: Decimal = 0
 
     private let direction: Direction
+    private let category: Category?
     private let transactionsService = TransactionsService()
     private let categoriesService = CategoriesService()
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(direction: Direction) {
+    init(direction: Direction, category: Category? = nil) {
         self.direction = direction
+        self.category = category
 
         let calendar = Calendar.current
         self.dateTo = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: Date()) ?? Date()
@@ -53,6 +55,10 @@ final class TransactionHistoryViewModel: ObservableObject {
             extendedTransactions.sort { abs($0.transaction.amount) < abs($1.transaction.amount) }
         }
     }
+    
+//    func filterTransactions(by category: Category) -> [ExtendedTransaction] {
+//        extendedTransactions.filter { $0.transaction.categoryId == category.id }
+//    }
 
     func load() async {
         do {
@@ -64,7 +70,10 @@ final class TransactionHistoryViewModel: ObservableObject {
             async let categories = categoriesService.categories()
             
             let (loadedTransactions, allCategories) = try await (transactions, categories)
-            let categoriesDict = Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
+            
+            let categoriesDict = category == nil
+                ? Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
+                : [category!.id : category!]
             
             let extended = loadedTransactions
                 .reduce(into: [ExtendedTransaction]()) { result, transaction in

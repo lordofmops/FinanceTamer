@@ -23,7 +23,11 @@ struct CategoriesListView: View {
                             Text("Нет статей")
                         } else {
                             ForEach(viewModel.filteredCategories(direction: .outcome)) { category in
-                                categoryRow(for: category)
+                                NavigationLink {
+                                    TransactionHistoryView(direction: category.direction, category: category)
+                                } label: {
+                                    categoryRow(for: category)
+                                }
                             }
                         }
                     }
@@ -33,7 +37,11 @@ struct CategoriesListView: View {
                             Text("Нет статей")
                         } else {
                             ForEach(viewModel.filteredCategories(direction: .income)) { category in
-                                categoryRow(for: category)
+                                NavigationLink {
+                                    TransactionHistoryView(direction: category.direction, category: category)
+                                } label: {
+                                    categoryRow(for: category)
+                                }
                             }
                         }
                     }
