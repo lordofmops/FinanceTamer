@@ -35,7 +35,7 @@ struct TabBarView: View {
                     Text("Счет")
                 }
 
-            CategoriesView()
+            CategoriesListView()
                 .tabItem {
                     Image("categories")
                         .renderingMode(.template)

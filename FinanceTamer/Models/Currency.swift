@@ -37,8 +37,4 @@ enum Currency: String, CaseIterable, Identifiable {
             return "Евро €"
         }
     }
-    
-    static var allCases: [Currency] {
-        return [.ruble, .dollar, .euro]
-    }
 }

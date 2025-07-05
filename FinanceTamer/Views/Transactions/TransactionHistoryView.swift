@@ -13,10 +13,12 @@ struct TransactionHistoryView: View {
     @StateObject private var viewModel: TransactionHistoryViewModel
     @State private var sortOption: SortOption = .date_desc
     let direction: Direction
+    let category: Category?
 
-    init(direction: Direction) {
+    init(direction: Direction, category: Category? = nil) {
         self.direction = direction
-        _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction)
+        self.category = category
+        _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction, category: category)
         )
     }
     
