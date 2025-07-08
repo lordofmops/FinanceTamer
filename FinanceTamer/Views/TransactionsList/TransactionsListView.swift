@@ -28,18 +28,15 @@ struct TransactionsListView: View {
                 List {
                     Section(header:
                         Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
-                            .padding(.horizontal, -18)
+                            .mainHeaderStyle()
                             .padding(.bottom, 20)
-                            .font(.system(size: 34, weight: .bold))
-                            .foregroundColor(.header)
-                            .textCase(nil)
                     ) {
                         HStack {
                             Text("Всего")
-                                .font(.system(size: 17, weight: .regular))
+                                .listRowStyle()
                             Spacer()
-                            Text("\(viewModel.total.formatted()) ₽")
-                                .font(.system(size: 17, weight: .regular))
+                            Text("\(viewModel.total.formatted()) \(viewModel.currency.symbol)")
+                                .listRowStyle()
                         }
                     }
                     

@@ -27,19 +27,14 @@ struct BankAccountView: View {
                 List {
                     Section(header:
                         Text("Мой счет")
-                            .padding(.horizontal, -18)
-                            .padding(.bottom, 20)
-                            .font(.system(size: 34, weight: .bold))
-                            .foregroundColor(.header)
-                            .textCase(nil)
+                            .mainHeaderStyle()
                     ) {
                         HStack {
                             Text("💰")
                                 .font(.system(size: 20))
                             
                             Text("Баланс")
-                                .font(.system(size: 17))
-                                .foregroundColor(.black)
+                                .listRowStyle(.black)
                             
                             Spacer()
                             
@@ -53,8 +48,7 @@ struct BankAccountView: View {
                                             .transition(.opacity)
                                     } else {
                                         Text("\(viewModel.balanceString) \(viewModel.selectedCurrency.symbol)")
-                                            .font(.system(size: 17, weight: .regular))
-                                            .foregroundColor(.black)
+                                            .listRowStyle(.black)
                                             .transition(.opacity)
                                     }
                                 }
@@ -75,14 +69,12 @@ struct BankAccountView: View {
                     Section {
                         HStack {
                             Text("Валюта")
-                                .font(.system(size: 17))
-                                .foregroundColor(.black)
+                                .listRowStyle(.black)
                             
                             Spacer()
                             
                             Text(viewModel.selectedCurrency.symbol)
-                                .font(.system(size: 17, weight: .regular))
-                                .foregroundColor(.black)
+                                .listRowStyle(.black)
                         }
                         .onTapGesture {
                             if isEditing {

@@ -59,14 +59,11 @@ struct CategoriesListView: View {
     private func categoryRow(for category: Category) -> some View {
          HStack {
             Text(String(category.emoji))
-                .font(.system(size: 14.5))
-                .frame(width: 22, height: 22)
-                .background(Color.lightGreen)
-                .clipShape(Circle())
+                 .emojiStyle()
             
             VStack(alignment: .leading) {
                 Text(category.name)
-                    .font(.body)
+                    .listRowStyle()
             }
         }
     }
