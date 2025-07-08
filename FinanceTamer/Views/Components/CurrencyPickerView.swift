@@ -16,7 +16,7 @@ struct CurrencyPickerView: View {
         VStack(spacing: 0) {
             Text("Валюта")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.black)
+                .foregroundColor(.header)
                 .frame(maxWidth: .infinity)
                 .frame(height: 44)
 
@@ -30,8 +30,7 @@ struct CurrencyPickerView: View {
                     dismiss()
                 }) {
                     Text(currency.name)
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundColor(.lightPurple)
+                        .listRowStyle(.lightPurple)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                 }

@@ -43,13 +43,11 @@ struct TransactionHistoryView: View {
             List {
                 Section(header:
                     Text("Моя история")
-                        .padding(.horizontal, -18)
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.header)
-                        .textCase(nil)
+                        .mainHeaderStyle()
                 ) {
                     HStack {
                         Text("Начало")
+                            .listRowStyle()
                         Spacer()
                         CustomDatePicker(date: $viewModel.dateFrom)
                     }
@@ -66,6 +64,7 @@ struct TransactionHistoryView: View {
                     
                     HStack {
                         Text("Конец")
+                            .listRowStyle()
                         Spacer()
                         CustomDatePicker(date: $viewModel.dateTo)
                     }
@@ -82,6 +81,7 @@ struct TransactionHistoryView: View {
                     
                     HStack {
                         Text("Сортировка")
+                            .listRowStyle()
                         Spacer()
                         Menu {
                             Text("Показывать сначала")
@@ -94,7 +94,7 @@ struct TransactionHistoryView: View {
                         } label: {
                             HStack {
                                 Text(sortOption.rawValue)
-                                    .foregroundColor(.black)
+                                    .listRowStyle(.black)
                                 
                                 Image(systemName: "chevron.down")
                                     .font(.system(size: 14))
@@ -112,10 +112,10 @@ struct TransactionHistoryView: View {
                     
                     HStack {
                         Text("Сумма")
-                            .font(.system(size: 17, weight: .regular))
+                            .listRowStyle()
                         Spacer()
                         Text("\(viewModel.total.formatted()) ₽")
-                            .font(.system(size: 17, weight: .regular))
+                            .listRowStyle()
                     }
                     
                 }

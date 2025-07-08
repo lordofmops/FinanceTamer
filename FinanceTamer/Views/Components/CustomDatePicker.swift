@@ -17,7 +17,7 @@ struct CustomDatePicker: View {
     var body: some View {
         HStack {
             Text(DateFormatters.dayMonth.string(from: date))
-                .font(.system(size: 17, weight: .regular))
+                .listRowStyle(.black)
         }
         .padding(.horizontal, 12)
         .foregroundColor(.black)

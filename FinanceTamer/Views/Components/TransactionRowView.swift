@@ -15,10 +15,7 @@ struct TransactionRowView: View {
     var body: some View {
         HStack {
             Text(String(extendedTransaction.category.emoji))
-                .font(.system(size: 14.5))
-                .frame(width: 22, height: 22)
-                .background(Color.lightGreen)
-                .clipShape(Circle())
+                .emojiStyle()
 
             VStack(alignment: .leading) {
                 Text(extendedTransaction.category.name)
@@ -33,7 +30,7 @@ struct TransactionRowView: View {
             Spacer()
 
             Text("\(extendedTransaction.transaction.amount.formatted()) ₽")
-                .font(.system(size: 17, weight: .regular))
+                .listRowStyle()
             
             Button(action: {
                 // изменить операцию
