@@ -20,7 +20,10 @@ final class EditTransactionViewModel: ObservableObject {
     let extendedTransaction: ExtendedTransaction
     
     var amount: Decimal {
-        Decimal(string: amountString.filter { $0.isNumber || $0 == "." || $0 == "," }) ?? 0
+        Decimal(string: amountString.filterBalanceString()) ?? 0
+    }
+    var maximumDate: Date {
+        Calendar.current.startOfDay(for: Date())
     }
     
     private let transactionsService = TransactionsService.shared

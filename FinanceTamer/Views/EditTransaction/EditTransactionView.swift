@@ -62,7 +62,10 @@ struct EditTransactionView: View {
         HStack {
             Text("Дата")
             Spacer()
-            DatePicker("", selection: $viewModel.date, displayedComponents: .date)
+            DatePicker("",
+                       selection: $viewModel.date,
+                       in: ...viewModel.maximumDate,
+                       displayedComponents: .date)
                 .labelsHidden()
         }
     }

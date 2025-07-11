@@ -57,7 +57,10 @@ struct AddTransactionView: View {
         HStack {
             Text("Дата")
             Spacer()
-            DatePicker("", selection: $viewModel.date, displayedComponents: .date)
+            DatePicker("",
+                       selection: $viewModel.date,
+                       in: ...viewModel.maximumDate,
+                       displayedComponents: .date)
                 .labelsHidden()
         }
     }
@@ -109,13 +112,23 @@ struct AddTransactionView: View {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Создать") {
                             Task {
-                                await viewModel.addTransaction()
+                                let success = await viewModel.addTransaction()
+                                if success {
+                                    dismiss()
+                                }
                             }
-                            dismiss()
                         }
                     }
                 }
             }
+            .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                Button("OK", role: .cancel) {
+                    viewModel.showErrorAlert = false
+                }
+            } message: {
+                Text(viewModel.errorMessage ?? "Unknown error")
+            }
+            
         }
     }
 }
