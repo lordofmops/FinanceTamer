@@ -18,7 +18,7 @@ final class TransactionsListViewModel: ObservableObject {
     @Published var total: Decimal = 0
     @Published var currency: Currency = .ruble
 
-    private let transactionsService = TransactionsService()
+    private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService()
     private let bankAccountService = BankAccountsService()
     

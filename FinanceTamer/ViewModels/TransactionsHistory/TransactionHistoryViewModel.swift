@@ -16,7 +16,7 @@ final class TransactionHistoryViewModel: ObservableObject {
 
     private let direction: Direction
     private let category: Category?
-    private let transactionsService = TransactionsService()
+    private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService()
 
     private var cancellables = Set<AnyCancellable>()

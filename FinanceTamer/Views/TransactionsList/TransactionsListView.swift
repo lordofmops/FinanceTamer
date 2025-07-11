@@ -16,6 +16,7 @@ struct TransactionsListView: View {
 
     @StateObject private var viewModel: TransactionsListViewModel
     @State private var path = NavigationPath()
+    @State private var selectedTransaction: ExtendedTransaction? = nil
 
     init(direction: Direction) {
         self.direction = direction
@@ -46,13 +47,23 @@ struct TransactionsListView: View {
                                 .font(.headline)
                         } else {
                             ForEach(viewModel.extendedTransactions) { transaction in
-                                TransactionRowView(extendedTransaction: transaction)
+                                TransactionRowView(extendedTransaction: transaction) {_ in
+                                    selectedTransaction = transaction
+                                }
                             }
                         }
                     }
                 }
                 .refreshable {
                     await viewModel.load()
+                }
+                .sheet(item: $selectedTransaction) { transaction in
+                    EditTransactionView(extendedTransaction: transaction)
+                        .onDisappear {
+                            Task {
+                                await viewModel.load()
+                            }
+                        }
                 }
                 .listSectionSpacing(12)
                 
