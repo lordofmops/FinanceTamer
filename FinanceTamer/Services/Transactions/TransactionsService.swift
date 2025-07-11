@@ -51,6 +51,20 @@ final class TransactionsService {
         transactions.filter { $0.date >= startDate && $0.date <= endDate }
     }
     
+    func addTransaction(accountId: Int = 0, categoryId: Int, amount: Decimal, date: Date, comment: String? = nil) async throws {
+        let newTransaction = Transaction(
+            id: (transactions.max(by: { $0.id < $1.id })?.id ?? 0) + 1,
+            accountId: accountId,
+            categoryId: categoryId,
+            amount: amount,
+            date: date,
+            comment: comment,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        transactions.append(newTransaction)
+    }
+    
     func updateTransaction(to updatedTransaction: Transaction) async throws {
         if let idx = transactions.firstIndex(where: { $0.id == updatedTransaction.id }) {
             transactions[idx] = updatedTransaction

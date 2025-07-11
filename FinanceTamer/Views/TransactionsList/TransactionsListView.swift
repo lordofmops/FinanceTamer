@@ -17,53 +17,53 @@ struct TransactionsListView: View {
     @StateObject private var viewModel: TransactionsListViewModel
     @State private var path = NavigationPath()
     @State private var selectedTransaction: ExtendedTransaction? = nil
+    @State private var showAddTransactionView: Bool = false
 
     init(direction: Direction) {
         self.direction = direction
         _viewModel = StateObject(wrappedValue: TransactionsListViewModel(direction: direction))
+    }
+    
+    private var totalSection: some View {
+        Section(header:
+            Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
+                .mainHeaderStyle()
+                .padding(.bottom, 20)
+        ) {
+            HStack {
+                Text("Всего")
+                    .listRowStyle()
+                Spacer()
+                Text("\(viewModel.total.formatted()) \(viewModel.currency.symbol)")
+                    .listRowStyle()
+            }
+        }
+    }
+    
+    private var transactionsSection: some View {
+        Section(header: Text("Операции")) {
+            if viewModel.extendedTransactions.isEmpty {
+                Text("Нет операций")
+                    .font(.headline)
+            } else {
+                ForEach(viewModel.extendedTransactions) { transaction in
+                    TransactionRowView(extendedTransaction: transaction) {_ in
+                        selectedTransaction = transaction
+                    }
+                }
+            }
+        }
     }
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading) {
                 List {
-                    Section(header:
-                        Text(direction == .outcome ? "Расходы сегодня" : "Доходы сегодня")
-                            .mainHeaderStyle()
-                            .padding(.bottom, 20)
-                    ) {
-                        HStack {
-                            Text("Всего")
-                                .listRowStyle()
-                            Spacer()
-                            Text("\(viewModel.total.formatted()) \(viewModel.currency.symbol)")
-                                .listRowStyle()
-                        }
-                    }
-                    
-                    Section(header: Text("Операции")) {
-                        if viewModel.extendedTransactions.isEmpty {
-                            Text("Нет операций")
-                                .font(.headline)
-                        } else {
-                            ForEach(viewModel.extendedTransactions) { transaction in
-                                TransactionRowView(extendedTransaction: transaction) {_ in
-                                    selectedTransaction = transaction
-                                }
-                            }
-                        }
-                    }
+                    totalSection
+                    transactionsSection
                 }
                 .refreshable {
                     await viewModel.load()
-                }
-                .sheet(item: $selectedTransaction) { transaction in
-                    EditTransactionView(extendedTransaction: transaction)
-                        .onDisappear {
-                            Task {
-                                await viewModel.load()
-                            }
-                        }
                 }
                 .listSectionSpacing(12)
                 
@@ -72,7 +72,7 @@ struct TransactionsListView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        // добавить новую операцию
+                        showAddTransactionView = true
                     }) {
                         Image("add_transaction_button")
                             .padding()
@@ -97,6 +97,22 @@ struct TransactionsListView: View {
                         Image("history_button")
                     }
                 }
+            }
+            .sheet(item: $selectedTransaction) { transaction in
+                EditTransactionView(extendedTransaction: transaction)
+                    .onDisappear {
+                        Task {
+                            await viewModel.load()
+                        }
+                    }
+            }
+            .sheet(isPresented: $showAddTransactionView) {
+                AddTransactionView()
+                    .onDisappear {
+                        Task {
+                            await viewModel.load()
+                        }
+                    }
             }
         }
     }
