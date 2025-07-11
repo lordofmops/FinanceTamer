@@ -13,6 +13,7 @@ struct TransactionHistoryView: View {
     @StateObject private var viewModel: TransactionHistoryViewModel
     @State private var sortOption: TransactionHistoryViewModel.SortOption = .date_desc
     @State private var showAnalysis = false
+    @State private var selectedTransaction: ExtendedTransaction? = nil
     
     let direction: Direction
     let category: Category?
@@ -115,7 +116,9 @@ struct TransactionHistoryView: View {
                             .font(.headline)
                     } else {
                         ForEach(viewModel.extendedTransactions) { transaction in
-                            TransactionRowView(extendedTransaction: transaction)
+                            TransactionRowView(extendedTransaction: transaction) {_ in
+                                selectedTransaction = transaction
+                            }
                         }
                     }
                 }
@@ -153,6 +156,14 @@ struct TransactionHistoryView: View {
         }.fullScreenCover(isPresented: $showAnalysis) {
             AnalysisView(direction: direction)
                 .ignoresSafeArea()
+        }
+        .sheet(item: $selectedTransaction) { transaction in
+            EditTransactionView(extendedTransaction: transaction)
+                .onDisappear {
+                    Task {
+                        await viewModel.load()
+                    }
+                }
         }
     }
 }
