@@ -11,7 +11,9 @@ struct TransactionHistoryView: View {
     @Environment(\.dismiss) var dismiss
     
     @StateObject private var viewModel: TransactionHistoryViewModel
-    @State private var sortOption: SortOption = .date_desc
+    @State private var sortOption: TransactionHistoryViewModel.SortOption = .date_desc
+    @State private var showAnalysis = false
+    
     let direction: Direction
     let category: Category?
 
@@ -20,22 +22,6 @@ struct TransactionHistoryView: View {
         self.category = category
         _viewModel = StateObject(wrappedValue: TransactionHistoryViewModel(direction: direction, category: category)
         )
-    }
-    
-    enum SortOption: String, CaseIterable {
-        case date_desc = "Новые"
-        case date_asc = "Старые"
-        case amount_desc = "Дороже"
-        case amount_asc = "Дешевле"
-        
-        var icon: String {
-            switch self {
-            case .date_desc: return "calendar.circle"
-            case .date_asc: return "calendar.circle.fill"
-            case .amount_desc: return "rublesign.circle"
-            case .amount_asc: return "rublesign.circle.fill"
-            }
-        }
     }
 
     var body: some View {
@@ -87,7 +73,7 @@ struct TransactionHistoryView: View {
                             Text("Показывать сначала")
                             
                             Picker(selection: $sortOption, label: EmptyView()) {
-                                ForEach(SortOption.allCases, id: \.self) { option in
+                                ForEach(TransactionHistoryViewModel.SortOption.allCases, id: \.self) { option in
                                     Label(option.rawValue, systemImage: option.icon).tag(option)
                                 }
                             }
@@ -158,12 +144,15 @@ struct TransactionHistoryView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
-                    // анализ
+                    showAnalysis = true
                 }) {
                     Image(systemName: "document")
                         .foregroundColor(.lightPurple)
                 }
             }
+        }.fullScreenCover(isPresented: $showAnalysis) {
+            AnalysisView(direction: direction)
+                .ignoresSafeArea()
         }
     }
 }
