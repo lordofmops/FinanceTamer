@@ -1,33 +1,36 @@
 import Foundation
 
 final class TransactionsService {
-    private var transactions: [Transaction] = [
+    static let shared = TransactionsService()
+    private init() {}
+    
+    @Published private(set) var transactions: [Transaction] = [
         Transaction(id: 1,
                     accountId: 1,
                     categoryId: 1,
                     amount: 80000,
-                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-12T13:55:57.197Z")!,
+                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
                     comment: "Аренда",
-                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-12T13:55:57.197Z")!,
-                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-12T13:55:57.197Z")!
+                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
+                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!
                    ),
         Transaction(id: 2,
                     accountId: 1,
                     categoryId: 3,
                     amount: 15000,
-                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!,
+                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
                     comment: "Ричард",
-                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!,
-                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!
+                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
+                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!
                    ),
         Transaction(id: 3,
                     accountId: 1,
                     categoryId: 3,
                     amount: 15000,
-                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!,
+                    date: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
                     comment: nil,
-                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!,
-                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-06-15T13:55:57.197Z")!
+                    createdAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!,
+                    updatedAt: DateFormatters.iso8601WithFractionalSeconds.date(from: "2025-07-12T13:55:57.197Z")!
                    ),
         Transaction(id: 4,
                     accountId: 1,
@@ -46,6 +49,20 @@ final class TransactionsService {
     
     func transactions(from startDate: Date, to endDate: Date) async throws -> [Transaction] {
         transactions.filter { $0.date >= startDate && $0.date <= endDate }
+    }
+    
+    func addTransaction(accountId: Int = 0, categoryId: Int, amount: Decimal, date: Date, comment: String? = nil) async throws {
+        let newTransaction = Transaction(
+            id: (transactions.max(by: { $0.id < $1.id })?.id ?? 0) + 1,
+            accountId: accountId,
+            categoryId: categoryId,
+            amount: amount,
+            date: date,
+            comment: comment,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        transactions.append(newTransaction)
     }
     
     func updateTransaction(to updatedTransaction: Transaction) async throws {

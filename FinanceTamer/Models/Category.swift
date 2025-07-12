@@ -5,7 +5,7 @@ enum Direction {
     case outcome
 }
 
-struct Category: Identifiable {
+struct Category: Identifiable, Hashable {
     let id: Int
     let name: String
     let emoji: Character

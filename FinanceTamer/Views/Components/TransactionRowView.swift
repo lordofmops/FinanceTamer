@@ -10,6 +10,7 @@ import SwiftUI
 struct TransactionRowView: View {
     let extendedTransaction: ExtendedTransaction
     
+    var onTap: ((ExtendedTransaction) -> Void)? = nil
     let categoriesService = CategoriesService()
 
     var body: some View {
@@ -32,12 +33,16 @@ struct TransactionRowView: View {
             Text("\(extendedTransaction.transaction.amount.formatted()) ₽")
                 .listRowStyle()
             
-            Button(action: {
-                // изменить операцию
-            }) {
-                Image("edit_button")
+            if let onTap = onTap {
+                Button(action: {
+                    onTap(extendedTransaction)
+                }) {
+                    Image("edit_button")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
+                }
             }
-            .frame(width: 16, height: 36)
         }
     }
 }

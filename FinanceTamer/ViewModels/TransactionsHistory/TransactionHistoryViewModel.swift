@@ -16,10 +16,26 @@ final class TransactionHistoryViewModel: ObservableObject {
 
     private let direction: Direction
     private let category: Category?
-    private let transactionsService = TransactionsService()
+    private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService()
 
     private var cancellables = Set<AnyCancellable>()
+    
+    enum SortOption: String, CaseIterable {
+        case date_desc = "Новые"
+        case date_asc = "Старые"
+        case amount_desc = "Дороже"
+        case amount_asc = "Дешевле"
+        
+        var icon: String {
+            switch self {
+            case .date_desc: return "calendar.circle"
+            case .date_asc: return "calendar.circle.fill"
+            case .amount_desc: return "rublesign.circle"
+            case .amount_asc: return "rublesign.circle.fill"
+            }
+        }
+    }
 
     init(direction: Direction, category: Category? = nil) {
         self.direction = direction
@@ -43,7 +59,7 @@ final class TransactionHistoryViewModel: ObservableObject {
         }
     }
     
-    func sortTransactions(by option: TransactionHistoryView.SortOption) {
+    func sortTransactions(by option: SortOption) {
         switch option {
         case .date_desc:
             extendedTransactions.sort { $0.transaction.date > $1.transaction.date }
@@ -55,10 +71,6 @@ final class TransactionHistoryViewModel: ObservableObject {
             extendedTransactions.sort { abs($0.transaction.amount) < abs($1.transaction.amount) }
         }
     }
-    
-//    func filterTransactions(by category: Category) -> [ExtendedTransaction] {
-//        extendedTransactions.filter { $0.transaction.categoryId == category.id }
-//    }
 
     func load() async {
         do {
