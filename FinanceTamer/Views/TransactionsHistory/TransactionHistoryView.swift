@@ -158,12 +158,11 @@ struct TransactionHistoryView: View {
                 .ignoresSafeArea()
         }
         .sheet(item: $selectedTransaction) { transaction in
-            EditTransactionView(extendedTransaction: transaction)
-                .onDisappear {
-                    Task {
-                        await viewModel.load()
-                    }
+            EditTransactionView(extendedTransaction: transaction) {
+                Task {
+                    await viewModel.load()
                 }
+            }
         }
     }
 }

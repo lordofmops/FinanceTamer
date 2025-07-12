@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class AnalysisViewController: UIViewController {
     private let direction: Direction
@@ -122,7 +123,6 @@ class AnalysisViewController: UIViewController {
 }
 
 extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
@@ -178,6 +178,15 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
                 return cell
             }
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+            
+        guard indexPath.section == 1, !viewModel.extendedTransactions.isEmpty else { return }
+        
+        let transaction = viewModel.extendedTransactions[indexPath.row]
+        presentEditView(for: transaction)
     }
     
     private func configureDateCell(_ cell: UITableViewCell, title: String, date: Date, selector: Selector) {
@@ -247,6 +256,16 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
     
     @objc private func sortButtonTapped() {
         showSortOptions()
+    }
+    
+    private func presentEditView(for transaction: ExtendedTransaction) {
+        let editView = EditTransactionView(extendedTransaction: transaction) { [weak self] in
+            self?.loadData()
+        }
+
+        let hostingController = UIHostingController(rootView: editView)
+        hostingController.modalPresentationStyle = .fullScreen
+        present(hostingController, animated: true)
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

@@ -99,12 +99,11 @@ struct TransactionsListView: View {
                 }
             }
             .sheet(item: $selectedTransaction) { transaction in
-                EditTransactionView(extendedTransaction: transaction)
-                    .onDisappear {
-                        Task {
-                            await viewModel.load()
-                        }
+                EditTransactionView(extendedTransaction: transaction) {
+                    Task {
+                        await viewModel.load()
                     }
+                }
             }
             .sheet(isPresented: $showAddTransactionView) {
                 AddTransactionView()

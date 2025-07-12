@@ -10,14 +10,16 @@ import SwiftUI
 struct EditTransactionView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var viewModel: EditTransactionViewModel
+    var onSave: () -> Void
     
     private let extendedTransaction: ExtendedTransaction
     private let direction: Direction
     
-    init(extendedTransaction: ExtendedTransaction) {
+    init(extendedTransaction: ExtendedTransaction, onSave: @escaping () -> Void = {}) {
         self.extendedTransaction = extendedTransaction
         _viewModel = StateObject(wrappedValue: EditTransactionViewModel(extendedTransaction))
         self.direction = extendedTransaction.category.direction
+        self.onSave = onSave
     }
     
     private var categoryRow: some View {
@@ -141,6 +143,7 @@ struct EditTransactionView: View {
                     Button("Сохранить") {
                         Task {
                             await viewModel.save()
+                            onSave()
                         }
                         dismiss()
                     }
