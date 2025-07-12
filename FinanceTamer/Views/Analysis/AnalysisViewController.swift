@@ -172,6 +172,7 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
                 return cell
             } else {
                 let cell = tableView.dequeueReusableCell(withIdentifier: TransactionCell.identifier, for: indexPath) as! TransactionCell
+                cell.total = viewModel.total
                 let transaction = viewModel.extendedTransactions[indexPath.row]
                 cell.configure(with: transaction)
                 return cell
