@@ -15,4 +15,4 @@ Packages/
 .swiftpm/
 .build/
 
-Token.plist
+/FinanceTamer/Token.plist
