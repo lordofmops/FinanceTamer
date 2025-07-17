@@ -18,6 +18,9 @@ final class TransactionsListViewModel: ObservableObject {
     @Published var extendedTransactions: [ExtendedTransaction] = []
     @Published var total: Decimal = 0
     @Published var currency: Currency = .ruble
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
 
     private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService.shared
@@ -30,6 +33,12 @@ final class TransactionsListViewModel: ObservableObject {
     }
 
     func load() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: Date())
         guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
@@ -62,12 +71,18 @@ final class TransactionsListViewModel: ObservableObject {
                 self.extendedTransactions = sortedTransactions
                 self.total = total
                 self.currency = currency
+                
+                self.isLoading = false
             }
             
         } catch {
             await MainActor.run {
                 self.extendedTransactions = []
                 self.total = 0
+                
+                self.isLoading = false
+                self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+                self.showErrorAlert = true
             }
             print("Error loading transactions: \(error)")
         }

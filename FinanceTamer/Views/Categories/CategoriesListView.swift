@@ -16,43 +16,57 @@ struct CategoriesListView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
-                List {
-                    Section(header: Text("Расходы")) {
-                        if viewModel.expenseCategories.isEmpty {
-                            Text("Нет статей")
-                        } else {
-                            ForEach(viewModel.filteredCategories(direction: .outcome)) { category in
-                                NavigationLink {
-                                    TransactionHistoryView(direction: category.direction, category: category)
-                                } label: {
-                                    categoryRow(for: category)
+            ZStack {
+                VStack(alignment: .leading) {
+                    List {
+                        Section(header: Text("Расходы")) {
+                            if viewModel.expenseCategories.isEmpty {
+                                Text("Нет статей")
+                            } else {
+                                ForEach(viewModel.filteredCategories(direction: .outcome)) { category in
+                                    NavigationLink {
+                                        TransactionHistoryView(direction: category.direction, category: category)
+                                    } label: {
+                                        categoryRow(for: category)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Section(header: Text("Доходы")) {
+                            if viewModel.incomeCategories.isEmpty {
+                                Text("Нет статей")
+                            } else {
+                                ForEach(viewModel.filteredCategories(direction: .income)) { category in
+                                    NavigationLink {
+                                        TransactionHistoryView(direction: category.direction, category: category)
+                                    } label: {
+                                        categoryRow(for: category)
+                                    }
                                 }
                             }
                         }
                     }
-                    
-                    Section(header: Text("Доходы")) {
-                        if viewModel.incomeCategories.isEmpty {
-                            Text("Нет статей")
-                        } else {
-                            ForEach(viewModel.filteredCategories(direction: .income)) { category in
-                                NavigationLink {
-                                    TransactionHistoryView(direction: category.direction, category: category)
-                                } label: {
-                                    categoryRow(for: category)
-                                }
-                            }
-                        }
-                    }
+                    .searchable(text: $viewModel.searchQuery)
                 }
-                .searchable(text: $viewModel.searchQuery)
+                .navigationTitle("Мои статьи")
+                .background(Color.background)
+                .task {
+                    await viewModel.load()
+                }
+                .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                    Button("ОК", role: .cancel) {
+                        viewModel.showErrorAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage ?? "Неизвестная ошибка")
+                }
+                
+                if viewModel.isLoading {
+                    LoadingView()
+                }
             }
-            .navigationTitle("Мои статьи")
-            .background(Color.background)
-            .task {
-                await viewModel.load()
-            }
+            .animation(.easeInOut, value: viewModel.isLoading)
         }
     }
     

@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import Combine
 
 class AnalysisViewController: UIViewController {
     private let direction: Direction
@@ -18,6 +19,9 @@ class AnalysisViewController: UIViewController {
     private let totalAmountLabel = UILabel()
     private let dateToPicker = CustomDatePickerView()
     private let dateFromPicker = CustomDatePickerView()
+    private let activityOverlay = UIActivityIndicatorView(style: .large)
+    
+    private var cancellables = Set<AnyCancellable>()
     
     init(direction: Direction) {
         self.direction = direction
@@ -35,6 +39,7 @@ class AnalysisViewController: UIViewController {
         
         loadData()
         setupUI()
+        bindViewModel()
         updateTotalAmount()
     }
     
@@ -69,6 +74,15 @@ class AnalysisViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        activityOverlay.translatesAutoresizingMaskIntoConstraints = false
+        activityOverlay.hidesWhenStopped = true
+        activityOverlay.color = .lightPurple
+        view.addSubview(activityOverlay)
+        NSLayoutConstraint.activate([
+            activityOverlay.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityOverlay.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -118,6 +132,34 @@ class AnalysisViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
         
+        present(alert, animated: true)
+    }
+    
+    private func bindViewModel() {
+        viewModel.$isLoading
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.activityOverlay.startAnimating()
+                } else {
+                    self?.activityOverlay.stopAnimating()
+                }
+            }
+            .store(in: &cancellables)
+
+        viewModel.$showErrorAlert
+            .receive(on: RunLoop.main)
+            .sink { [weak self] show in
+                guard show, let message = self?.viewModel.errorMessage else { return }
+                self?.presentAlert(message: message)
+                self?.viewModel.showErrorAlert = false // сбрасываем флаг
+            }
+            .store(in: &cancellables)
+    }
+
+    private func presentAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ОК", style: .default))
         present(alert, animated: true)
     }
 }

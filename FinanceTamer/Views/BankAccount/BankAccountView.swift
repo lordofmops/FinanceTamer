@@ -21,116 +21,129 @@ struct BankAccountView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            VStack {
-                List {
-                    Section(header:
-                        Text("Мой счет")
+            ZStack {
+                VStack {
+                    List {
+                        Section(header:
+                                    Text("Мой счет")
                             .mainHeaderStyle()
-                    ) {
-                        HStack {
-                            Text("💰")
-                                .font(.system(size: 20))
-                            
-                            Text("Баланс")
-                                .listRowStyle(.black)
-                            
-                            Spacer()
-                            
-                            if !isEditing {
-                                ZStack {
-                                    if isBalanceHidden {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color.black.opacity(0.08))
-                                            .frame(width: 73, height: 20)
-                                            .blur(radius: 3)
-                                            .transition(.opacity)
-                                    } else {
-                                        Text("\(viewModel.balanceString) \(viewModel.selectedCurrency.symbol)")
-                                            .listRowStyle(.black)
-                                            .transition(.opacity)
+                        ) {
+                            HStack {
+                                Text("💰")
+                                    .font(.system(size: 20))
+                                
+                                Text("Баланс")
+                                    .listRowStyle(.black)
+                                
+                                Spacer()
+                                
+                                if !isEditing {
+                                    ZStack {
+                                        if isBalanceHidden {
+                                            RoundedRectangle(cornerRadius: 4)
+                                                .fill(Color.black.opacity(0.08))
+                                                .frame(width: 73, height: 20)
+                                                .blur(radius: 3)
+                                                .transition(.opacity)
+                                        } else {
+                                            Text("\(viewModel.balanceString) \(viewModel.selectedCurrency.symbol)")
+                                                .listRowStyle(.black)
+                                                .transition(.opacity)
+                                        }
                                     }
+                                    .frame(height: 20)
+                                    .animation(.easeInOut(duration: 0.3), value: isBalanceHidden)
+                                } else {
+                                    TextField("Введите сумму", text: $viewModel.balanceString)
+                                        .keyboardType(.decimalPad)
+                                        .multilineTextAlignment(.trailing)
                                 }
-                                .frame(height: 20)
-                                .animation(.easeInOut(duration: 0.3), value: isBalanceHidden)
-                            } else {
-                                TextField("Введите сумму", text: $viewModel.balanceString)
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
                             }
                         }
-                    }
-                    .listRowBackground(isEditing
-                                       ? Color.white
-                                       : Color.accentColor)
-                    
-                    Section {
-                        HStack {
-                            Text("Валюта")
-                                .listRowStyle(.black)
-                            
-                            Spacer()
-                            
-                            Text(viewModel.selectedCurrency.symbol)
-                                .listRowStyle(.black)
-                        }
-                        .onTapGesture {
-                            if isEditing {
-                                showCurrencyPicker = true
-                            }
-                        }
-                    }
-                    .listRowBackground(isEditing
-                                       ? Color.white
-                                       : Color.lightGreen)
-                }
-                .padding(.top, -14)
-                .listSectionSpacing(16)
-                .refreshable {
-                    Task {
-                        await viewModel.load()
-                    }
-                }
-                .scrollDismissesKeyboard(.immediately)
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if isEditing {
-                        Button(action: {
-                            Task {
-                                await viewModel.saveChanges()
-                                isEditing = false
-                                showCurrencyPicker = false
-                            }
-                            
-                        }) {
+                        .listRowBackground(isEditing
+                                           ? Color.white
+                                           : Color.accentColor)
+                        
+                        Section {
                             HStack {
-                                Text("Сохранить")
+                                Text("Валюта")
+                                    .listRowStyle(.black)
+                                
+                                Spacer()
+                                
+                                Text(viewModel.selectedCurrency.symbol)
+                                    .listRowStyle(.black)
                             }
-                            .foregroundColor(.lightPurple)
+                            .onTapGesture {
+                                if isEditing {
+                                    showCurrencyPicker = true
+                                }
+                            }
                         }
-                    } else {
-                        Button(action: {
-                            isEditing = true
-                            isBalanceHidden = false
-                        }) {
-                            HStack {
-                                Text("Редактировать")
+                        .listRowBackground(isEditing
+                                           ? Color.white
+                                           : Color.lightGreen)
+                    }
+                    .padding(.top, -14)
+                    .listSectionSpacing(16)
+                    .refreshable {
+                        Task {
+                            await viewModel.load()
+                        }
+                    }
+                    .scrollDismissesKeyboard(.immediately)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if isEditing {
+                            Button(action: {
+                                Task {
+                                    await viewModel.saveChanges()
+                                    isEditing = false
+                                    showCurrencyPicker = false
+                                }
+                                
+                            }) {
+                                HStack {
+                                    Text("Сохранить")
+                                }
+                                .foregroundColor(.lightPurple)
                             }
-                            .foregroundColor(.lightPurple)
+                        } else {
+                            Button(action: {
+                                isEditing = true
+                                isBalanceHidden = false
+                            }) {
+                                HStack {
+                                    Text("Редактировать")
+                                }
+                                .foregroundColor(.lightPurple)
+                            }
                         }
                     }
                 }
+                .popover(isPresented: $showCurrencyPicker) {
+                    CurrencyPickerView(
+                        selectedCurrency: $viewModel.selectedCurrency,
+                        currencies: viewModel.availableCurrencies
+                    )
+                    .presentationDetents([.height(212)])
+                    .background(Color.clear)
+                    .presentationBackground(.clear)
+                }
+                .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                    Button("ОК", role: .cancel) {
+                        viewModel.showErrorAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage ?? "Неизвестная ошибка")
+                }
+                
+                if viewModel.isLoading {
+                    LoadingView()
+                }
             }
-            .popover(isPresented: $showCurrencyPicker) {
-                CurrencyPickerView(
-                    selectedCurrency: $viewModel.selectedCurrency,
-                    currencies: viewModel.availableCurrencies
-                )
-                .presentationDetents([.height(212)])
-                .background(Color.clear)
-                .presentationBackground(.clear)
-            }
-            
+            .animation(.easeInOut, value: viewModel.isLoading)
         }
         .task {
             await viewModel.load()

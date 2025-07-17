@@ -14,6 +14,9 @@ final class TransactionHistoryViewModel: ObservableObject {
     @Published var extendedTransactions: [ExtendedTransaction] = []
     @Published var total: Decimal = 0
     @Published var currency: Currency = .ruble
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
 
     private let direction: Direction
     private let category: Category?
@@ -75,6 +78,12 @@ final class TransactionHistoryViewModel: ObservableObject {
     }
 
     func load() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         do {
             let calendar = Calendar.current
             let dateFrom = calendar.startOfDay(for: self.dateFrom)
@@ -114,12 +123,18 @@ final class TransactionHistoryViewModel: ObservableObject {
                 self.total = total
                 self.currency = currency
                 sortTransactions(by: .date_desc)
+                
+                self.isLoading = false
             }
             
         } catch {
             await MainActor.run {
                 self.extendedTransactions = []
                 self.total = 0
+                
+                self.isLoading = false
+                self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+                self.showErrorAlert = true
             }
             print("Error loading transactions: \(error)")
         }

@@ -16,6 +16,9 @@ final class EditTransactionViewModel: ObservableObject {
     @Published var showCategoryPicker: Bool = false
     @Published var selectedCategory: Category
     @Published var categories: [Category] = []
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
     
     let extendedTransaction: ExtendedTransaction
     
@@ -46,16 +49,30 @@ final class EditTransactionViewModel: ObservableObject {
     }
     
     private func loadCategories() {
+        errorMessage = nil
+        showErrorAlert = false
+        isLoading = true
+        
         Task { @MainActor in
             do {
                 self.categories = try await categoriesService.categories(direction: direction)
+                self.isLoading = false
             } catch {
+                errorMessage = "Не получилось загрузить категории"
+                showErrorAlert = true
+                isLoading = false
                 print("Error fetching categories: \(error)")
             }
         }
     }
     
     func save() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         do {
             let fullDate = merge(date: date, time: time)
             let bankAccount = try await bankAccountService.account()
@@ -92,8 +109,16 @@ final class EditTransactionViewModel: ObservableObject {
                     updatedAt: bankAccount.updatedAt
                 )
             )
+            
+            await MainActor.run {
+                isLoading = false
+            }
         } catch {
             await MainActor.run {
+                self.isLoading = false
+                self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+                self.showErrorAlert = true
+                
                 print("Error saving transaction: \(error)")
             }
         }

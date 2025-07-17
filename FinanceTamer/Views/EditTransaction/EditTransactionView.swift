@@ -115,40 +115,54 @@ struct EditTransactionView: View {
 
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 0) {
-                Form {
-                    Section {
-                        categoryRow
-                        sumRow
-                        dateRow
-                        timeRow
-                        commentRow
-                    }
-                    
-                    Section {
-                        deleteButton
-                    }
-                }
-                .listSectionSpacing(40)
-            }
-            .navigationTitle(direction == .outcome ? "Мои Расходы" : "Мои Доходы")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") {
-                        dismiss()
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Сохранить") {
-                        Task {
-                            await viewModel.save()
-                            onSave()
+            ZStack {
+                VStack(alignment: .leading, spacing: 0) {
+                    Form {
+                        Section {
+                            categoryRow
+                            sumRow
+                            dateRow
+                            timeRow
+                            commentRow
                         }
-                        dismiss()
+                        
+                        Section {
+                            deleteButton
+                        }
+                    }
+                    .listSectionSpacing(40)
+                }
+                .navigationTitle(direction == .outcome ? "Мои Расходы" : "Мои Доходы")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Отмена") {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Сохранить") {
+                            Task {
+                                await viewModel.save()
+                                onSave()
+                            }
+                            dismiss()
+                        }
                     }
                 }
+                .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                    Button("ОК", role: .cancel) {
+                        viewModel.showErrorAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage ?? "Неизвестная ошибка")
+                }
+                
+                if viewModel.isLoading {
+                    LoadingView()
+                }
             }
+            .animation(.easeInOut, value: viewModel.isLoading)
         }
     }
 }

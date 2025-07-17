@@ -34,7 +34,7 @@ final class TransactionCell: UITableViewCell {
         rightStack.alignment = .trailing
         rightStack.spacing = 2
 
-        categoryLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        categoryLabel.font = .systemFont(ofSize: 17, weight: .regular)
         commentLabel.font = .systemFont(ofSize: 14, weight: .light)
         commentLabel.textColor = .gray
         amountLabel.font = .systemFont(ofSize: 16, weight: .regular)

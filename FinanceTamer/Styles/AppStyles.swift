@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+struct LoadingView: View {
+    var body: some View {
+        ProgressView()
+            .scaleEffect(1.5)
+            .accentColor(.lightPurple)
+    }
+}
+
 extension View {
     func mainHeaderStyle() -> some View {
         self
