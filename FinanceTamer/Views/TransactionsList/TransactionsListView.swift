@@ -107,7 +107,7 @@ struct TransactionsListView: View {
                 }
             }
             .sheet(isPresented: $showAddTransactionView) {
-                AddTransactionView()
+                AddTransactionView(direction: direction)
                     .onDisappear {
                         Task {
                             await viewModel.load()

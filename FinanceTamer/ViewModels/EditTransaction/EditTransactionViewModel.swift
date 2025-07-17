@@ -43,8 +43,7 @@ final class EditTransactionViewModel: ObservableObject {
     private func loadCategories() {
         Task { @MainActor in
             do {
-                let fetchedCategories = try await categoriesService.categories()
-                self.categories = fetchedCategories.filter { $0.direction == extendedTransaction.category.direction }
+                self.categories = try await categoriesService.categories(direction: extendedTransaction.category.direction)
             } catch {
                 print("Error fetching categories: \(error)")
             }

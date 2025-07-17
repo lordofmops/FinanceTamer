@@ -46,7 +46,7 @@ final class TransactionsService {
             throw NetworkError.invalidURL
         }
         
-        let response: TransactionResponseBrief = try await networkClient.request(
+        let _: TransactionResponseBrief = try await networkClient.request(
             url: url,
             method: .post,
             requestBody: newTransaction

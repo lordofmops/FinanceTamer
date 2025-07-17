@@ -4,6 +4,9 @@ final class CategoriesService {
     static let shared = CategoriesService()
     
     private var categories: [Category] = []
+    private var incomeCategories: [Category] = []
+    private var outcomeCategories: [Category] = []
+    
     private let networkClient = NetworkClient.shared
     
     private init() {}
@@ -13,6 +16,23 @@ final class CategoriesService {
             return try await loadCategories()
         } else {
             return categories
+        }
+    }
+    
+    func categories(direction: Direction) async throws -> [Category] {
+        switch direction {
+        case .income:
+            if incomeCategories.isEmpty {
+                return try await loadCategories(direction: .income)
+            } else {
+                return incomeCategories
+            }
+        case .outcome:
+            if outcomeCategories.isEmpty {
+                return try await loadCategories(direction: .outcome)
+            } else {
+                return outcomeCategories
+            }
         }
     }
     
@@ -37,7 +57,7 @@ final class CategoriesService {
         return categories
     }
     
-    func categories(direction: Direction) async throws -> [Category] {
+    private func loadCategories(direction: Direction) async throws -> [Category] {
         let type = direction == .income ? "true" : "false"
         guard let url = URL(string: Constants.baseURLString + Constants.categoriesByTypeRoute(type)) else {
             print("Failed to create categories URL")
@@ -56,7 +76,12 @@ final class CategoriesService {
         }
         
         print("Categories with direction \(direction) loaded successfully")
-        self.categories = categories
+        switch direction {
+        case .income:
+            self.incomeCategories = categories
+        case .outcome:
+            self.outcomeCategories = categories
+        }
         return categories
     }
     

@@ -26,11 +26,14 @@ final class AddTransactionViewModel: ObservableObject {
         Calendar.current.startOfDay(for: Date())
     }
     
+    private let direction: Direction
+
     private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService.shared
     private let bankAccountService = BankAccountsService.shared
     
-    init() {
+    init(direction: Direction) {
+        self.direction = direction
         loadCategories()
     }
     
@@ -40,7 +43,7 @@ final class AddTransactionViewModel: ObservableObject {
         
         Task { @MainActor in
             do {
-                let fetchedCategories = try await categoriesService.categories()
+                let fetchedCategories = try await categoriesService.categories(direction: direction)
                 self.categories = fetchedCategories
             } catch {
                 print("Error fetching categories: \(error)")

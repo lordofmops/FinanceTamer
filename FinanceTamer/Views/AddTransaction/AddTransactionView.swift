@@ -11,8 +11,8 @@ struct AddTransactionView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var viewModel: AddTransactionViewModel
     
-    init() {
-        _viewModel = StateObject(wrappedValue: AddTransactionViewModel())
+    init(direction: Direction) {
+        _viewModel = StateObject(wrappedValue: AddTransactionViewModel(direction: direction))
     }
     
     private var categoryRow: some View {

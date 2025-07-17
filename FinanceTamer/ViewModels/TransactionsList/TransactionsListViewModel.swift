@@ -36,27 +36,30 @@ final class TransactionsListViewModel: ObservableObject {
         
         do {
             async let transactions = transactionsService.transactions(from: startOfDay, to: endOfDay)
-            async let categories = categoriesService.categories()
+            async let categories = categoriesService.categories(direction: direction)
             async let bankAccount = bankAccountService.account()
             
-            let (loadedTransactions, allCategories, account) = try await (transactions, categories, bankAccount)
-            let categoriesDict = Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
-            let currency = Currency(rawValue: account.currency) ?? .ruble
+            let (loadedTransactions, loadedCategories, loadedAccount) = try await (transactions, categories, bankAccount)
+            let currency = Currency(rawValue: loadedAccount.currency) ?? .ruble
             
-            let extended = loadedTransactions
-                .reduce(into: [ExtendedTransaction]()) { result, transaction in
-                    guard let category = categoriesDict[transaction.categoryId],
-                          category.direction == direction else { return }
-                    
-                    result.append(ExtendedTransaction(transaction: transaction, category: category, currency: currency))
+            var extended: [ExtendedTransaction] = []
+            loadedTransactions.forEach { transaction in
+                if let category = loadedCategories.filter({ $0.id == transaction.categoryId }).first {
+                    extended.append(
+                        ExtendedTransaction(
+                            transaction: transaction,
+                            category: category,
+                            currency: currency
+                        )
+                    )
                 }
-                .sorted { $0.transaction.date > $1.transaction.date }
-            
+            }
+            let sortedTransactions = extended.sorted { $0.transaction.date > $1.transaction.date }
             
             let total: Decimal = extended.map { $0.transaction.amount }.reduce(0, +)
             
             await MainActor.run {
-                self.extendedTransactions = extended
+                self.extendedTransactions = sortedTransactions
                 self.total = total
                 self.currency = currency
             }
