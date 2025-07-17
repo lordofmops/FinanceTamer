@@ -85,6 +85,14 @@ final class NetworkClient {
             guard 200..<300 ~= httpResponse.statusCode else {
                 throw NetworkError.requestFailed(statusCode: httpResponse.statusCode, data: data)
             }
+            
+            if data.isEmpty {
+                if T.self == EmptyResponse.self {
+                    return EmptyResponse() as! T
+                } else {
+                    throw NetworkError.decodingFailed
+                }
+            }
 
             do {
                 let jsonDecoder = JSONDecoder()

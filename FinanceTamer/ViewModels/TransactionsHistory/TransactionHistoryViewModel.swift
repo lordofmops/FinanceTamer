@@ -81,11 +81,17 @@ final class TransactionHistoryViewModel: ObservableObject {
             let dateTo = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: self.dateTo) ?? self.dateTo
             
             async let transactions = transactionsService.transactions(from: dateFrom, to: dateTo)
-            async let categories = categoriesService.categories(direction: direction)
             async let account = bankAccountsService.account()
             
-            let (loadedTransactions, loadedCategories, loadedAccount) = try await (transactions, categories, account)
+            let (loadedTransactions, loadedAccount) = try await (transactions, account)
             let currency = Currency(rawValue: loadedAccount.currency) ?? .ruble
+            
+            var loadedCategories: [Category] = []
+            if let category {
+                loadedCategories.append(category)
+            } else {
+                loadedCategories = try await categoriesService.categories(direction: direction)
+            }
             
             var extended: [ExtendedTransaction] = []
             loadedTransactions.forEach { transaction in

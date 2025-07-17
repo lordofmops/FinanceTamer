@@ -8,10 +8,6 @@ final class TransactionsService {
     
     private init() {}
     
-//    func transactions() async throws -> [Transaction] {
-//        transactions
-//    }
-    
     func transactions(from startDate: Date, to endDate: Date) async throws -> [Transaction] {
         guard let url = URL(string: Constants.baseURLString + Constants.transactionsByPeriodRoute(accountId: 89)) else {
             print("Failed to create transactions URL")
@@ -70,12 +66,11 @@ final class TransactionsService {
             comment: updatedTransaction.comment
         )
         
-        let response: TransactionResponse = try await networkClient.request(
+        let _: TransactionResponse = try await networkClient.request(
             url: url,
             method: .put,
             requestBody: requestBody
         )
-        let newTransaction = Transaction(from: response)
         
         print("Transaction updated successfully")
     }
@@ -87,7 +82,7 @@ final class TransactionsService {
         }
         let url = baseUrl.appendingPathComponent("/\(id)")
         
-        let _: TransactionResponse? = try await networkClient.request(
+        let _: EmptyResponse = try await networkClient.request(
             url: url,
             method: .delete
         )
