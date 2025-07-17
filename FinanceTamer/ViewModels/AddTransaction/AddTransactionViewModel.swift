@@ -86,6 +86,26 @@ final class AddTransactionViewModel: ObservableObject {
                 comment: comment.isEmpty ? nil : comment
             )
             
+            var newBalance = bankAccount.balance
+            switch direction {
+            case .income:
+                newBalance += amount
+            case .outcome:
+                newBalance -= amount
+            }
+            
+            try await bankAccountService.updateAccount(to:
+                BankAccount(
+                    id: bankAccount.id,
+                    userId: bankAccount.userId,
+                    name: bankAccount.name,
+                    balance: newBalance,
+                    currency: bankAccount.currency,
+                    createdAt: bankAccount.createdAt,
+                    updatedAt: bankAccount.updatedAt
+                )
+            )
+            
             return true
         } catch {
             await MainActor.run {

@@ -15,8 +15,6 @@ struct BankAccountView: View {
     @State private var showCurrencyPicker: Bool = false
     @State private var isBalanceHidden: Bool = false
     
-    @FocusState private var isBalanceFocused: Bool
-    
     init() {
         _viewModel = StateObject(wrappedValue: BankAccountViewModel())
     }
@@ -56,9 +54,8 @@ struct BankAccountView: View {
                                 .animation(.easeInOut(duration: 0.3), value: isBalanceHidden)
                             } else {
                                 TextField("Введите сумму", text: $viewModel.balanceString)
-                                .keyboardType(.numbersAndPunctuation)
+                                .keyboardType(.decimalPad)
                                 .multilineTextAlignment(.trailing)
-                                .focused($isBalanceFocused)
                             }
                         }
                     }
@@ -95,13 +92,6 @@ struct BankAccountView: View {
                 }
                 .scrollDismissesKeyboard(.immediately)
             }
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    if isEditing {
-                        isBalanceFocused = true
-                    }
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if isEditing {
@@ -109,7 +99,6 @@ struct BankAccountView: View {
                             Task {
                                 await viewModel.saveChanges()
                                 isEditing = false
-                                isBalanceFocused = false
                                 showCurrencyPicker = false
                             }
                             

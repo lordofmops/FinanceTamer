@@ -26,8 +26,11 @@ final class EditTransactionViewModel: ObservableObject {
         Calendar.current.startOfDay(for: Date())
     }
     
+    private let direction: Direction
+    
     private let transactionsService = TransactionsService.shared
     private let categoriesService = CategoriesService.shared
+    private let bankAccountService = BankAccountsService.shared
     
     init(_ extendedTransaction: ExtendedTransaction) {
         self.extendedTransaction = extendedTransaction
@@ -37,13 +40,15 @@ final class EditTransactionViewModel: ObservableObject {
         self.time = extendedTransaction.transaction.date
         self.comment = extendedTransaction.transaction.comment ?? ""
         
+        self.direction = extendedTransaction.category.direction
+        
         loadCategories()
     }
     
     private func loadCategories() {
         Task { @MainActor in
             do {
-                self.categories = try await categoriesService.categories(direction: extendedTransaction.category.direction)
+                self.categories = try await categoriesService.categories(direction: direction)
             } catch {
                 print("Error fetching categories: \(error)")
             }
@@ -53,6 +58,7 @@ final class EditTransactionViewModel: ObservableObject {
     func save() async {
         do {
             let fullDate = merge(date: date, time: time)
+            let bankAccount = try await bankAccountService.account()
             
             let newTransaction = Transaction(
                 id: extendedTransaction.id,
@@ -66,6 +72,26 @@ final class EditTransactionViewModel: ObservableObject {
             )
             
             try await transactionsService.updateTransaction(to: newTransaction)
+            
+            var newBalance = bankAccount.balance
+            switch direction {
+            case .income:
+                newBalance += amount
+            case .outcome:
+                newBalance -= amount
+            }
+            
+            try await bankAccountService.updateAccount(to:
+                BankAccount(
+                    id: bankAccount.id,
+                    userId: bankAccount.userId,
+                    name: bankAccount.name,
+                    balance: newBalance,
+                    currency: bankAccount.currency,
+                    createdAt: bankAccount.createdAt,
+                    updatedAt: bankAccount.updatedAt
+                )
+            )
         } catch {
             await MainActor.run {
                 print("Error saving transaction: \(error)")
@@ -75,7 +101,29 @@ final class EditTransactionViewModel: ObservableObject {
     
     func delete() async {
         do {
+            let bankAccount = try await bankAccountService.account()
+            
             try await transactionsService.deleteTransaction(extendedTransaction.id)
+            
+            var newBalance = bankAccount.balance
+            switch direction {
+            case .income:
+                newBalance -= extendedTransaction.transaction.amount
+            case .outcome:
+                newBalance += extendedTransaction.transaction.amount
+            }
+            
+            try await bankAccountService.updateAccount(to:
+                BankAccount(
+                    id: bankAccount.id,
+                    userId: bankAccount.userId,
+                    name: bankAccount.name,
+                    balance: newBalance,
+                    currency: bankAccount.currency,
+                    createdAt: bankAccount.createdAt,
+                    updatedAt: bankAccount.updatedAt
+                )
+            )
         } catch {
             await MainActor.run {
                 print("Error deleting transaction: \(error)")
