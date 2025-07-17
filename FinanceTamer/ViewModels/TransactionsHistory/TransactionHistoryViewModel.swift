@@ -81,30 +81,30 @@ final class TransactionHistoryViewModel: ObservableObject {
             let dateTo = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: self.dateTo) ?? self.dateTo
             
             async let transactions = transactionsService.transactions(from: dateFrom, to: dateTo)
-            async let categories = categoriesService.categories()
+            async let categories = categoriesService.categories(direction: direction)
             async let account = bankAccountsService.account()
             
-            let (loadedTransactions, allCategories, bankAccount) = try await (transactions, categories, account)
+            let (loadedTransactions, loadedCategories, loadedAccount) = try await (transactions, categories, account)
+            let currency = Currency(rawValue: loadedAccount.currency) ?? .ruble
             
-            let categoriesDict = category == nil
-                ? Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
-                : [category!.id : category!]
-            let currency = Currency(rawValue: bankAccount.currency) ?? .ruble
-            
-            let extended = loadedTransactions
-                .reduce(into: [ExtendedTransaction]()) { result, transaction in
-                    guard let category = categoriesDict[transaction.categoryId],
-                          category.direction == direction else { return }
-                    
-                    result.append(ExtendedTransaction(transaction: transaction, category: category, currency: currency))
+            var extended: [ExtendedTransaction] = []
+            loadedTransactions.forEach { transaction in
+                if let category = loadedCategories.filter({ $0.id == transaction.categoryId }).first {
+                    extended.append(
+                        ExtendedTransaction(
+                            transaction: transaction,
+                            category: category,
+                            currency: currency
+                        )
+                    )
                 }
-                .sorted { $0.transaction.createdAt > $1.transaction.createdAt }
-            
+            }
+            let sortedTransactions = extended.sorted { $0.transaction.date > $1.transaction.date }
             
             let total: Decimal = extended.map { $0.transaction.amount }.reduce(0, +)
             
             await MainActor.run {
-                self.extendedTransactions = extended
+                self.extendedTransactions = sortedTransactions
                 self.total = total
                 self.currency = currency
                 sortTransactions(by: .date_desc)
