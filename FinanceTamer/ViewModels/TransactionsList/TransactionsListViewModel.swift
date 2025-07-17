@@ -43,7 +43,6 @@ final class TransactionsListViewModel: ObservableObject {
             
             let extended = loadedTransactions
                 .reduce(into: [ExtendedTransaction]()) { result, transaction in
-                    print(transaction.id)
                     guard let category = categoriesDict[transaction.categoryId],
                           category.direction == direction else { return }
                     

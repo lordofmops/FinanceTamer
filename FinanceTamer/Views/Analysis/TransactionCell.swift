@@ -67,7 +67,9 @@ final class TransactionCell: UITableViewCell {
             let percentageInt = NSDecimalNumber(decimal: percentageDecimal).rounding(accordingToBehavior: .none)
             percentageLabel.text = "\(percentageInt)%"
         }
-        commentLabel.text = extendedTransaction.transaction.comment
+        if let comment = extendedTransaction.transaction.comment, !comment.isEmpty {
+            commentLabel.text = extendedTransaction.transaction.comment
+        }
         categoryLabel.text = extendedTransaction.category.name
         amountLabel.text = "\(extendedTransaction.transaction.amount.formatted()) ₽"
         emojiLabel.text = String(extendedTransaction.category.emoji)

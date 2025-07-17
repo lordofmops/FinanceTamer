@@ -7,7 +7,7 @@ final class CategoriesService {
     
     func categories() async throws -> [Category] {
         guard let url = URL(string: Constants.baseURLString + Constants.categoriesRoute) else {
-            print("Failed to create account URL")
+            print("Failed to create categories URL")
             throw NetworkError.invalidURL
         }
         
@@ -26,13 +26,12 @@ final class CategoriesService {
     }
     
     func categories(direction: Direction) async throws -> [Category] {
-        guard let baseUrl = URL(string: Constants.baseURLString + Constants.categoriesByTypeRoute) else {
-            print("Failed to create account URL")
+        let type = direction == .income ? "true" : "false"
+        guard let url = URL(string: Constants.baseURLString + Constants.categoriesByTypeRoute(type)) else {
+            print("Failed to create categories URL")
             throw NetworkError.invalidURL
         }
-        
-        let url = baseUrl.appendingPathComponent("\(direction == .income ? "true" : "false")")
-        
+
         let response: [CategoryResponse] = try await networkClient.request(
             url: url,
             method: .get,

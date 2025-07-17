@@ -21,7 +21,7 @@ struct TransactionRowView: View {
             VStack(alignment: .leading) {
                 Text(extendedTransaction.category.name)
                     .font(.body)
-                if let comment = extendedTransaction.transaction.comment {
+                if let comment = extendedTransaction.transaction.comment, !comment.isEmpty  {
                     Text(comment)
                         .font(.caption)
                         .foregroundColor(.gray)

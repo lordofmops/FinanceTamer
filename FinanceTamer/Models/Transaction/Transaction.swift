@@ -12,6 +12,30 @@ struct Transaction: Identifiable {
 }
 
 extension Transaction {
+    init(from transactionResponse: TransactionResponse) {
+        self.id = transactionResponse.id
+        self.accountId = transactionResponse.account.id
+        self.categoryId = transactionResponse.category.id
+        self.amount = Decimal(string: transactionResponse.amount) ?? 0
+        self.date = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponse.transactionDate) ?? Date()
+        self.comment = transactionResponse.comment
+        self.createdAt = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponse.createdAt) ?? Date()
+        self.updatedAt = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponse.updatedAt) ?? Date()
+    }
+    
+    init(from transactionResponseBrief: TransactionResponseBrief) {
+        self.id = transactionResponseBrief.id
+        self.accountId = transactionResponseBrief.accountId
+        self.categoryId = transactionResponseBrief.categoryId
+        self.amount = Decimal(string: transactionResponseBrief.amount) ?? 0
+        self.date = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponseBrief.transactionDate) ?? Date()
+        self.comment = transactionResponseBrief.comment
+        self.createdAt = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponseBrief.createdAt) ?? Date()
+        self.updatedAt = DateFormatters.iso8601WithFractionalSeconds.date(from: transactionResponseBrief.updatedAt) ?? Date()
+    }
+}
+
+extension Transaction {
     static func parse(jsonObject: Any) -> Transaction? {
         guard let dictionary = jsonObject as? [String: Any],
               let id = dictionary["id"] as? Int,
