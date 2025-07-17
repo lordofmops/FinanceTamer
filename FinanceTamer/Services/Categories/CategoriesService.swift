@@ -1,19 +1,52 @@
 import Foundation
 
 final class CategoriesService {
-    private var categories: [Category] = [
-        Category(id: 1, name: "Аренда квартиры", emoji: "🏠", direction: .outcome),
-        Category(id: 2, name: "Одежда", emoji: "👔", direction: .outcome),
-        Category(id: 3, name: "На собачку", emoji: "🐕", direction: .outcome),
-        Category(id: 4, name: "Зарплата", emoji: "💼", direction: .income)
-    ]
+    private var categories: [Category] = []
+    
+    private let networkClient = NetworkClient.shared
     
     func categories() async throws -> [Category] {
-        categories
+        guard let url = URL(string: Constants.baseURLString + Constants.categoriesRoute) else {
+            print("Failed to create account URL")
+            throw NetworkError.invalidURL
+        }
+        
+        let response: [CategoryResponse] = try await networkClient.request(
+            url: url,
+            method: .get,
+            requestBody: Optional<CategoryRequest>.none
+        )
+        var categories: [Category] = []
+        
+        response.forEach { categoryResponse in
+            categories.append(Category(from: categoryResponse))
+        }
+        
+        self.categories = categories
+        return categories
     }
     
     func categories(direction: Direction) async throws -> [Category] {
-        categories.filter { $0.direction == direction }
+        guard let baseUrl = URL(string: Constants.baseURLString + Constants.categoriesByTypeRoute) else {
+            print("Failed to create account URL")
+            throw NetworkError.invalidURL
+        }
+        
+        let url = baseUrl.appendingPathComponent("\(direction == .income ? "true" : "false")")
+        
+        let response: [CategoryResponse] = try await networkClient.request(
+            url: url,
+            method: .get,
+            requestBody: Optional<CategoryRequest>.none
+        )
+        var categories: [Category] = []
+        
+        response.forEach { categoryResponse in
+            categories.append(Category(from: categoryResponse))
+        }
+        
+        self.categories = categories
+        return categories
     }
     
     func category(for transaction: Transaction) async throws -> Category {
