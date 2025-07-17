@@ -13,8 +13,7 @@ final class CategoriesService {
         
         let response: [CategoryResponse] = try await networkClient.request(
             url: url,
-            method: .get,
-            requestBody: Optional<CategoryRequest>.none
+            method: .get
         )
         var categories: [Category] = []
         

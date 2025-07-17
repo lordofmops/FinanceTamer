@@ -51,7 +51,7 @@ final class NetworkClient {
     func request<T: Decodable, U: Encodable>(
         url: URL,
         method: HTTPMethod,
-        requestBody: U?
+        requestBody: U? = Optional<DefaultEncodable>.none
     ) async throws -> T {
         guard let token = TokenStorage.shared.token else {
             throw NetworkError.missingToken

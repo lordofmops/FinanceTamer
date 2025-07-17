@@ -12,7 +12,10 @@ final class BankAccountsService {
             throw NetworkError.invalidURL
         }
         
-        let response: [BankAccountResponse] = try await networkClient.request(url: url, method: .get, requestBody: Optional<BankAccountRequest>.none)
+        let response: [BankAccountResponse] = try await networkClient.request(
+            url: url,
+            method: .get
+        )
         let account = BankAccount(from: response[0])
         
         self.account = account
