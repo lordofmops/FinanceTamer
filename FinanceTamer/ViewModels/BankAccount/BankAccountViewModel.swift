@@ -21,7 +21,7 @@ final class BankAccountViewModel: ObservableObject {
     @Published var selectedCurrency: Currency = .ruble
     let availableCurrencies = Currency.allCases
     
-    private let bankAccountsService = BankAccountsService()
+    private let bankAccountsService = BankAccountsService.shared
     
     init() {}
 

@@ -13,11 +13,13 @@ final class TransactionHistoryViewModel: ObservableObject {
     @Published var dateTo: Date
     @Published var extendedTransactions: [ExtendedTransaction] = []
     @Published var total: Decimal = 0
+    @Published var currency: Currency = .ruble
 
     private let direction: Direction
     private let category: Category?
     private let transactionsService = TransactionsService.shared
-    private let categoriesService = CategoriesService()
+    private let categoriesService = CategoriesService.shared
+    private let bankAccountsService = BankAccountsService.shared
 
     private var cancellables = Set<AnyCancellable>()
     
@@ -80,19 +82,21 @@ final class TransactionHistoryViewModel: ObservableObject {
             
             async let transactions = transactionsService.transactions(from: dateFrom, to: dateTo)
             async let categories = categoriesService.categories()
+            async let account = bankAccountsService.account()
             
-            let (loadedTransactions, allCategories) = try await (transactions, categories)
+            let (loadedTransactions, allCategories, bankAccount) = try await (transactions, categories, account)
             
             let categoriesDict = category == nil
                 ? Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
                 : [category!.id : category!]
+            let currency = Currency(rawValue: bankAccount.currency) ?? .ruble
             
             let extended = loadedTransactions
                 .reduce(into: [ExtendedTransaction]()) { result, transaction in
                     guard let category = categoriesDict[transaction.categoryId],
                           category.direction == direction else { return }
                     
-                    result.append(ExtendedTransaction(transaction: transaction, category: category))
+                    result.append(ExtendedTransaction(transaction: transaction, category: category, currency: currency))
                 }
                 .sorted { $0.transaction.createdAt > $1.transaction.createdAt }
             
@@ -102,6 +106,7 @@ final class TransactionHistoryViewModel: ObservableObject {
             await MainActor.run {
                 self.extendedTransactions = extended
                 self.total = total
+                self.currency = currency
                 sortTransactions(by: .date_desc)
             }
             

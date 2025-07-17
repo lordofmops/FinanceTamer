@@ -1,11 +1,22 @@
 import Foundation
 
 final class CategoriesService {
-    private var categories: [Category] = []
+    static let shared = CategoriesService()
     
+    private var categories: [Category] = []
     private let networkClient = NetworkClient.shared
     
+    private init() {}
+    
     func categories() async throws -> [Category] {
+        if categories.isEmpty {
+            return try await loadCategories()
+        } else {
+            return categories
+        }
+    }
+    
+    private func loadCategories() async throws -> [Category] {
         guard let url = URL(string: Constants.baseURLString + Constants.categoriesRoute) else {
             print("Failed to create categories URL")
             throw NetworkError.invalidURL
@@ -21,6 +32,7 @@ final class CategoriesService {
             categories.append(Category(from: categoryResponse))
         }
         
+        print("Categories loaded successfully")
         self.categories = categories
         return categories
     }
@@ -43,6 +55,7 @@ final class CategoriesService {
             categories.append(Category(from: categoryResponse))
         }
         
+        print("Categories with direction \(direction) loaded successfully")
         self.categories = categories
         return categories
     }
@@ -51,6 +64,8 @@ final class CategoriesService {
         guard let category = categories.first(where: { $0.id == transaction.categoryId }) else {
             throw NSError(domain: "CategoriesService", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid category id"])
         }
+        
+        print("Categories for transaction \(transaction.id) loaded successfully")
         return category
     }
 }

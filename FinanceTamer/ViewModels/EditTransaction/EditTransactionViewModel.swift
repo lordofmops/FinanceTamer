@@ -27,7 +27,7 @@ final class EditTransactionViewModel: ObservableObject {
     }
     
     private let transactionsService = TransactionsService.shared
-    private let categoriesService = CategoriesService()
+    private let categoriesService = CategoriesService.shared
     
     init(_ extendedTransaction: ExtendedTransaction) {
         self.extendedTransaction = extendedTransaction

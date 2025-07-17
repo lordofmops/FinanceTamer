@@ -1,12 +1,25 @@
 import Foundation
 
 final class BankAccountsService {
-    private var account: BankAccount?
+    static let shared = BankAccountsService()
     
+    private var account: BankAccount?
     private let networkClient = NetworkClient.shared
     private let urlString = Constants.baseURLString + Constants.accountsRoute
     
+    private init() {}
+    
     func account() async throws -> BankAccount {
+        if let account {
+            return account
+        } else {
+            do {
+                return try await loadAccount()
+            }
+        }
+    }
+    
+    private func loadAccount() async throws -> BankAccount {
         guard let url = URL(string: Constants.baseURLString + Constants.accountsRoute) else {
             print("Failed to create account URL")
             throw NetworkError.invalidURL
@@ -18,6 +31,7 @@ final class BankAccountsService {
         )
         let account = BankAccount(from: response[0])
         
+        print("Account loaded successfully")
         self.account = account
         return account
     }
@@ -42,5 +56,6 @@ final class BankAccountsService {
         )
         
         self.account = BankAccount(from: response)
+        print("Account updated successfully")
     }
 }

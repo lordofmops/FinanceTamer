@@ -71,7 +71,7 @@ final class TransactionCell: UITableViewCell {
             commentLabel.text = extendedTransaction.transaction.comment
         }
         categoryLabel.text = extendedTransaction.category.name
-        amountLabel.text = "\(extendedTransaction.transaction.amount.formatted()) ₽"
+        amountLabel.text = "\(extendedTransaction.transaction.amount.formatted()) \(extendedTransaction.currency.symbol)"
         emojiLabel.text = String(extendedTransaction.category.emoji)
         emojiLabel.backgroundColor = .lightGreen
         emojiLabel.layer.cornerRadius = 16

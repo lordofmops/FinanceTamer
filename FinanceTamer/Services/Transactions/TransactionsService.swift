@@ -3,15 +3,14 @@ import Foundation
 final class TransactionsService {
     static let shared = TransactionsService()
     
+    private var transactions: [Transaction] = []
     private let networkClient = NetworkClient.shared
     
     private init() {}
     
-    @Published private(set) var transactions: [Transaction] = []
-    
-    func transactions() async throws -> [Transaction] {
-        transactions
-    }
+//    func transactions() async throws -> [Transaction] {
+//        transactions
+//    }
     
     func transactions(from startDate: Date, to endDate: Date) async throws -> [Transaction] {
         guard let url = URL(string: Constants.baseURLString + Constants.transactionsByPeriodRoute(accountId: 89)) else {
@@ -29,7 +28,7 @@ final class TransactionsService {
             transactions.append(Transaction(from: transactionResponse))
         }
         
-        self.transactions = transactions
+        print("Transactions loaded successfully")
         return transactions
     }
     
@@ -53,7 +52,7 @@ final class TransactionsService {
             requestBody: newTransaction
         )
         
-        transactions.append(Transaction(from: response))
+        print("Transaction added successfully")
     }
     
     func updateTransaction(to updatedTransaction: Transaction) async throws {
@@ -78,9 +77,7 @@ final class TransactionsService {
         )
         let newTransaction = Transaction(from: response)
         
-        if let idx = transactions.firstIndex(where: { $0.id == newTransaction.id }) {
-            transactions[idx] = newTransaction
-        }
+        print("Transaction updated successfully")
     }
     
     func deleteTransaction(_ id: Int) async throws {
@@ -95,6 +92,6 @@ final class TransactionsService {
             method: .delete
         )
         
-        transactions.removeAll { $0.id == id }
+        print("Transaction deleted successfully")
     }
 }

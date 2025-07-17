@@ -27,8 +27,8 @@ final class AddTransactionViewModel: ObservableObject {
     }
     
     private let transactionsService = TransactionsService.shared
-    private let categoriesService = CategoriesService()
-    private let bankAccountService = BankAccountsService()
+    private let categoriesService = CategoriesService.shared
+    private let bankAccountService = BankAccountsService.shared
     
     init() {
         loadCategories()

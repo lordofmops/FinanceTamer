@@ -11,6 +11,7 @@ struct ExtendedTransaction: Identifiable {
     var id: Int { transaction.id }
     let transaction: Transaction
     let category: Category
+    let currency: Currency
 }
 
 final class TransactionsListViewModel: ObservableObject {
@@ -19,8 +20,8 @@ final class TransactionsListViewModel: ObservableObject {
     @Published var currency: Currency = .ruble
 
     private let transactionsService = TransactionsService.shared
-    private let categoriesService = CategoriesService()
-    private let bankAccountService = BankAccountsService()
+    private let categoriesService = CategoriesService.shared
+    private let bankAccountService = BankAccountsService.shared
     
     private let direction: Direction
     
@@ -40,13 +41,14 @@ final class TransactionsListViewModel: ObservableObject {
             
             let (loadedTransactions, allCategories, account) = try await (transactions, categories, bankAccount)
             let categoriesDict = Dictionary(uniqueKeysWithValues: allCategories.map { ($0.id, $0) })
+            let currency = Currency(rawValue: account.currency) ?? .ruble
             
             let extended = loadedTransactions
                 .reduce(into: [ExtendedTransaction]()) { result, transaction in
                     guard let category = categoriesDict[transaction.categoryId],
                           category.direction == direction else { return }
                     
-                    result.append(ExtendedTransaction(transaction: transaction, category: category))
+                    result.append(ExtendedTransaction(transaction: transaction, category: category, currency: currency))
                 }
                 .sorted { $0.transaction.date > $1.transaction.date }
             
@@ -56,7 +58,7 @@ final class TransactionsListViewModel: ObservableObject {
             await MainActor.run {
                 self.extendedTransactions = extended
                 self.total = total
-                self.currency = Currency(rawValue: account.currency) ?? .ruble
+                self.currency = currency
             }
             
         } catch {

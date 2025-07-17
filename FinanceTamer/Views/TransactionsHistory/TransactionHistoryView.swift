@@ -101,7 +101,7 @@ struct TransactionHistoryView: View {
                         Text("Сумма")
                             .listRowStyle()
                         Spacer()
-                        Text("\(viewModel.total.formatted()) ₽")
+                        Text("\(viewModel.total.formatted()) \(viewModel.currency.symbol)")
                             .listRowStyle()
                     }
                     
@@ -158,11 +158,12 @@ struct TransactionHistoryView: View {
                 .ignoresSafeArea()
         }
         .sheet(item: $selectedTransaction) { transaction in
-            EditTransactionView(extendedTransaction: transaction) {
-                Task {
-                    await viewModel.load()
+            EditTransactionView(extendedTransaction: transaction)
+                .onDisappear() {
+                    Task {
+                        await viewModel.load()
+                    }
                 }
-            }
         }
     }
 }

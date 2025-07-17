@@ -11,7 +11,7 @@ final class CategoriesViewModel: ObservableObject {
     @Published var expenseCategories: [Category] = []
     @Published var searchQuery: String = ""
     
-    private let categoriesService = CategoriesService()
+    private let categoriesService = CategoriesService.shared
     
     func load() async {
         do {
