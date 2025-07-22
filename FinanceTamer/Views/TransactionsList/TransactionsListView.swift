@@ -57,62 +57,77 @@ struct TransactionsListView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(alignment: .leading) {
-                List {
-                    totalSection
-                    transactionsSection
-                }
-                .refreshable {
-                    await viewModel.load()
-                }
-                .listSectionSpacing(12)
-                
-                Spacer()
-                
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        showAddTransactionView = true
-                    }) {
-                        Image("add_transaction_button")
-                            .padding()
+            ZStack {
+                VStack(alignment: .leading) {
+                    List {
+                        totalSection
+                        transactionsSection
                     }
-                    .frame(width: 56, height: 56)
-                    .padding()
-                }
-            }
-            .task {
-                await viewModel.load()
-            }
-            .background(Color.background)
-            .navigationDestination(for: MyRoute.self) { route in
-                switch route {
-                case .transactionHistory(let direction):
-                    TransactionHistoryView(direction: direction)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(value: MyRoute.transactionHistory(direction)) {
-                        Image("history_button")
-                    }
-                }
-            }
-            .sheet(item: $selectedTransaction) { transaction in
-                EditTransactionView(extendedTransaction: transaction) {
-                    Task {
+                    .refreshable {
                         await viewModel.load()
                     }
+                    .listSectionSpacing(12)
+                    
+                    Spacer()
+                    
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            showAddTransactionView = true
+                        }) {
+                            Image("add_transaction_button")
+                                .padding()
+                        }
+                        .frame(width: 56, height: 56)
+                        .padding()
+                    }
                 }
-            }
-            .sheet(isPresented: $showAddTransactionView) {
-                AddTransactionView()
-                    .onDisappear {
-                        Task {
-                            await viewModel.load()
+                .task {
+                    await viewModel.load()
+                }
+                .background(Color.background)
+                .navigationDestination(for: MyRoute.self) { route in
+                    switch route {
+                    case .transactionHistory(let direction):
+                        TransactionHistoryView(direction: direction)
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink(value: MyRoute.transactionHistory(direction)) {
+                            Image("history_button")
                         }
                     }
+                }
+                .sheet(item: $selectedTransaction) { transaction in
+                    EditTransactionView(extendedTransaction: transaction)
+                        .onDisappear {
+                            Task {
+                                await viewModel.load()
+                            }
+                        }
+                }
+                .sheet(isPresented: $showAddTransactionView) {
+                    AddTransactionView(direction: direction)
+                        .onDisappear {
+                            Task {
+                                await viewModel.load()
+                            }
+                        }
+                }
+                .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                    Button("ОК", role: .cancel) {
+                        viewModel.showErrorAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage ?? "Неизвестная ошибка")
+                }
+                
+                if viewModel.isLoading {
+                    LoadingView()
+                }
             }
+            .animation(.easeInOut, value: viewModel.isLoading)
         }
     }
 }

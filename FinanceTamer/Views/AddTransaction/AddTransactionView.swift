@@ -11,8 +11,8 @@ struct AddTransactionView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject var viewModel: AddTransactionViewModel
     
-    init() {
-        _viewModel = StateObject(wrappedValue: AddTransactionViewModel())
+    init(direction: Direction) {
+        _viewModel = StateObject(wrappedValue: AddTransactionViewModel(direction: direction))
     }
     
     private var categoryRow: some View {
@@ -90,45 +90,51 @@ struct AddTransactionView: View {
     
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 0) {
-                Form {
-                    Section {
-                        categoryRow
-                        sumRow
-                        dateRow
-                        timeRow
-                        commentRow
-                    }
-                }
-                .listSectionSpacing(40)
-                .navigationTitle("Добавить операцию")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Отмена") {
-                            dismiss()
+            ZStack {
+                VStack(alignment: .leading, spacing: 0) {
+                    Form {
+                        Section {
+                            categoryRow
+                            sumRow
+                            dateRow
+                            timeRow
+                            commentRow
                         }
                     }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Создать") {
-                            Task {
-                                let success = await viewModel.addTransaction()
-                                if success {
-                                    dismiss()
+                    .listSectionSpacing(40)
+                    .navigationTitle("Добавить операцию")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Отмена") {
+                                dismiss()
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Создать") {
+                                Task {
+                                    let success = await viewModel.addTransaction()
+                                    if success {
+                                        dismiss()
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
-                Button("OK", role: .cancel) {
-                    viewModel.showErrorAlert = false
+                .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                    Button("OK", role: .cancel) {
+                        viewModel.showErrorAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage ?? "Unknown error")
                 }
-            } message: {
-                Text(viewModel.errorMessage ?? "Unknown error")
+                
+                if viewModel.isLoading {
+                    LoadingView()
+                }
             }
-            
+            .animation(.easeInOut, value: viewModel.isLoading)
         }
     }
 }

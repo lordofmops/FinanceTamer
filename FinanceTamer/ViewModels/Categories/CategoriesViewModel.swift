@@ -10,10 +10,19 @@ final class CategoriesViewModel: ObservableObject {
     @Published var incomeCategories: [Category] = []
     @Published var expenseCategories: [Category] = []
     @Published var searchQuery: String = ""
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
     
-    private let categoriesService = CategoriesService()
+    private let categoriesService = CategoriesService.shared
     
     func load() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         do {
             async let expenseCategories = categoriesService.categories(direction: .outcome)
             async let incomeCategories = categoriesService.categories(direction: .income)
@@ -23,9 +32,15 @@ final class CategoriesViewModel: ObservableObject {
             await MainActor.run {
                 self.incomeCategories = allIncomeCategories
                 self.expenseCategories = allExpenseCategories
+                
+                self.isLoading = false
             }
         } catch {
             print("Error loading categories: \(error)")
+            
+            self.isLoading = false
+            self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+            self.showErrorAlert = true
         }
     }
     

@@ -34,7 +34,7 @@ final class TransactionCell: UITableViewCell {
         rightStack.alignment = .trailing
         rightStack.spacing = 2
 
-        categoryLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        categoryLabel.font = .systemFont(ofSize: 17, weight: .regular)
         commentLabel.font = .systemFont(ofSize: 14, weight: .light)
         commentLabel.textColor = .gray
         amountLabel.font = .systemFont(ofSize: 16, weight: .regular)
@@ -67,9 +67,11 @@ final class TransactionCell: UITableViewCell {
             let percentageInt = NSDecimalNumber(decimal: percentageDecimal).rounding(accordingToBehavior: .none)
             percentageLabel.text = "\(percentageInt)%"
         }
-        commentLabel.text = extendedTransaction.transaction.comment
+        if let comment = extendedTransaction.transaction.comment, !comment.isEmpty {
+            commentLabel.text = extendedTransaction.transaction.comment
+        }
         categoryLabel.text = extendedTransaction.category.name
-        amountLabel.text = "\(extendedTransaction.transaction.amount.formatted()) ₽"
+        amountLabel.text = "\(extendedTransaction.transaction.amount.formatted()) \(extendedTransaction.currency.symbol)"
         emojiLabel.text = String(extendedTransaction.category.emoji)
         emojiLabel.backgroundColor = .lightGreen
         emojiLabel.layer.cornerRadius = 16

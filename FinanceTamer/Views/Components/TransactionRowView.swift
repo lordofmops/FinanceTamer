@@ -11,7 +11,7 @@ struct TransactionRowView: View {
     let extendedTransaction: ExtendedTransaction
     
     var onTap: ((ExtendedTransaction) -> Void)? = nil
-    let categoriesService = CategoriesService()
+    let categoriesService = CategoriesService.shared
 
     var body: some View {
         HStack {
@@ -21,7 +21,7 @@ struct TransactionRowView: View {
             VStack(alignment: .leading) {
                 Text(extendedTransaction.category.name)
                     .font(.body)
-                if let comment = extendedTransaction.transaction.comment {
+                if let comment = extendedTransaction.transaction.comment, !comment.isEmpty  {
                     Text(comment)
                         .font(.caption)
                         .foregroundColor(.gray)
@@ -30,7 +30,7 @@ struct TransactionRowView: View {
 
             Spacer()
 
-            Text("\(extendedTransaction.transaction.amount.formatted()) ₽")
+            Text("\(extendedTransaction.transaction.amount.formatted()) \(extendedTransaction.currency.symbol)")
                 .listRowStyle()
             
             if let onTap = onTap {

@@ -26,144 +26,159 @@ struct TransactionHistoryView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            List {
-                Section(header:
-                    Text("Моя история")
+        ZStack {
+            VStack(alignment: .leading) {
+                List {
+                    Section(header:
+                                Text("Моя история")
                         .mainHeaderStyle()
-                ) {
-                    HStack {
-                        Text("Начало")
-                            .listRowStyle()
-                        Spacer()
-                        CustomDatePicker(date: $viewModel.dateFrom)
-                    }
-                    .onChange(of: viewModel.dateFrom) { oldValue, newValue in
-                        if newValue > viewModel.dateTo {
-                            viewModel.dateTo = newValue
+                    ) {
+                        HStack {
+                            Text("Начало")
+                                .listRowStyle()
+                            Spacer()
+                            CustomDatePicker(date: $viewModel.dateFrom)
                         }
-                        if oldValue != newValue {
-                            Task {
-                                await viewModel.load()
+                        .onChange(of: viewModel.dateFrom) { oldValue, newValue in
+                            if newValue > viewModel.dateTo {
+                                viewModel.dateTo = newValue
                             }
-                        }
-                    }
-                    
-                    HStack {
-                        Text("Конец")
-                            .listRowStyle()
-                        Spacer()
-                        CustomDatePicker(date: $viewModel.dateTo)
-                    }
-                    .onChange(of: viewModel.dateTo) { oldValue, newValue in
-                        if newValue < viewModel.dateFrom {
-                            viewModel.dateFrom = newValue
-                        }
-                        if oldValue != newValue {
-                            Task {
-                                await viewModel.load()
-                            }
-                        }
-                    }
-                    
-                    HStack {
-                        Text("Сортировка")
-                            .listRowStyle()
-                        Spacer()
-                        Menu {
-                            Text("Показывать сначала")
-                            
-                            Picker(selection: $sortOption, label: EmptyView()) {
-                                ForEach(TransactionHistoryViewModel.SortOption.allCases, id: \.self) { option in
-                                    Label(option.rawValue, systemImage: option.icon).tag(option)
+                            if oldValue != newValue {
+                                Task {
+                                    await viewModel.load()
                                 }
                             }
-                        } label: {
-                            HStack {
-                                Text(sortOption.rawValue)
-                                    .listRowStyle(.black)
+                        }
+                        
+                        HStack {
+                            Text("Конец")
+                                .listRowStyle()
+                            Spacer()
+                            CustomDatePicker(date: $viewModel.dateTo)
+                        }
+                        .onChange(of: viewModel.dateTo) { oldValue, newValue in
+                            if newValue < viewModel.dateFrom {
+                                viewModel.dateFrom = newValue
+                            }
+                            if oldValue != newValue {
+                                Task {
+                                    await viewModel.load()
+                                }
+                            }
+                        }
+                        
+                        HStack {
+                            Text("Сортировка")
+                                .listRowStyle()
+                            Spacer()
+                            Menu {
+                                Text("Показывать сначала")
                                 
-                                Image(systemName: "chevron.down")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.black)
+                                Picker(selection: $sortOption, label: EmptyView()) {
+                                    ForEach(TransactionHistoryViewModel.SortOption.allCases, id: \.self) { option in
+                                        Label(option.rawValue, systemImage: option.icon).tag(option)
+                                    }
+                                }
+                            } label: {
+                                HStack {
+                                    Text(sortOption.rawValue)
+                                        .listRowStyle(.black)
+                                    
+                                    Image(systemName: "chevron.down")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.black)
+                                }
+                                .frame(height: 34)
+                                .padding(.horizontal, 12)
+                                .background(Color.lightGreen)
+                                .cornerRadius(6)
                             }
-                            .frame(height: 34)
-                            .padding(.horizontal, 12)
-                            .background(Color.lightGreen)
-                            .cornerRadius(6)
+                            .onChange(of: sortOption) { _, newOption in
+                                viewModel.sortTransactions(by: newOption)
+                            }
                         }
-                        .onChange(of: sortOption) { _, newOption in
-                            viewModel.sortTransactions(by: newOption)
+                        
+                        HStack {
+                            Text("Сумма")
+                                .listRowStyle()
+                            Spacer()
+                            Text("\(viewModel.total.formatted()) \(viewModel.currency.symbol)")
+                                .listRowStyle()
                         }
+                        
                     }
                     
-                    HStack {
-                        Text("Сумма")
-                            .listRowStyle()
-                        Spacer()
-                        Text("\(viewModel.total.formatted()) ₽")
-                            .listRowStyle()
-                    }
-                    
-                }
-                
-                Section(header:
-                    Text("Операции")
+                    Section(header:
+                                Text("Операции")
                         .padding(.horizontal, -18)
-                ) {
-                    if viewModel.extendedTransactions.isEmpty {
-                        Text("Нет операций")
-                            .font(.headline)
-                    } else {
-                        ForEach(viewModel.extendedTransactions) { transaction in
-                            TransactionRowView(extendedTransaction: transaction) {_ in
-                                selectedTransaction = transaction
+                    ) {
+                        if viewModel.extendedTransactions.isEmpty {
+                            Text("Нет операций")
+                                .font(.headline)
+                        } else {
+                            ForEach(viewModel.extendedTransactions) { transaction in
+                                TransactionRowView(extendedTransaction: transaction) {_ in
+                                    selectedTransaction = transaction
+                                }
                             }
                         }
                     }
                 }
-            }
-            .padding(.top, -20)
-            .listSectionSpacing(0)
-            .refreshable {
-                Task {
-                    await viewModel.load()
-                }
-            }
-        }
-        .background(Color.background)
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Назад")
+                .padding(.top, -20)
+                .listSectionSpacing(0)
+                .refreshable {
+                    Task {
+                        await viewModel.load()
                     }
-                    .foregroundColor(.lightPurple)
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    showAnalysis = true
-                }) {
-                    Image(systemName: "document")
+            .background(Color.background)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("Назад")
+                        }
                         .foregroundColor(.lightPurple)
+                    }
                 }
-            }
-        }.fullScreenCover(isPresented: $showAnalysis) {
-            AnalysisView(direction: direction)
-                .ignoresSafeArea()
-        }
-        .sheet(item: $selectedTransaction) { transaction in
-            EditTransactionView(extendedTransaction: transaction) {
-                Task {
-                    await viewModel.load()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        showAnalysis = true
+                    }) {
+                        Image(systemName: "document")
+                            .foregroundColor(.lightPurple)
+                    }
                 }
+            }.fullScreenCover(isPresented: $showAnalysis) {
+                AnalysisView(direction: direction)
+                    .ignoresSafeArea()
+            }
+            .sheet(item: $selectedTransaction) { transaction in
+                EditTransactionView(extendedTransaction: transaction)
+                    .onDisappear() {
+                        Task {
+                            await viewModel.load()
+                        }
+                    }
+            }
+            .alert("Что-то не так", isPresented: $viewModel.showErrorAlert) {
+                Button("ОК", role: .cancel) {
+                    viewModel.showErrorAlert = false
+                }
+            } message: {
+                Text(viewModel.errorMessage ?? "Неизвестная ошибка")
+            }
+            
+            if viewModel.isLoading {
+                LoadingView()
             }
         }
+        .animation(.easeInOut, value: viewModel.isLoading)
     }
 }
 

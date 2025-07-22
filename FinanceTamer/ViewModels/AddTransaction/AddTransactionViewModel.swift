@@ -18,6 +18,7 @@ final class AddTransactionViewModel: ObservableObject {
     @Published var categories: [Category] = []
     @Published var errorMessage: String?
     @Published var showErrorAlert: Bool = false
+    @Published var isLoading: Bool = false
     
     var amount: Decimal {
         Decimal(string: amountString.filterBalanceString()) ?? 0
@@ -26,23 +27,32 @@ final class AddTransactionViewModel: ObservableObject {
         Calendar.current.startOfDay(for: Date())
     }
     
+    private let direction: Direction
+
     private let transactionsService = TransactionsService.shared
-    private let categoriesService = CategoriesService()
-    private let bankAccountService = BankAccountsService()
+    private let categoriesService = CategoriesService.shared
+    private let bankAccountService = BankAccountsService.shared
     
-    init() {
+    init(direction: Direction) {
+        self.direction = direction
         loadCategories()
     }
     
     private func loadCategories() {
         errorMessage = nil
         showErrorAlert = false
+        isLoading = true
         
         Task { @MainActor in
             do {
-                let fetchedCategories = try await categoriesService.categories()
+                let fetchedCategories = try await categoriesService.categories(direction: direction)
                 self.categories = fetchedCategories
+                
+                self.isLoading = false
             } catch {
+                errorMessage = "Не получилось загрузить категории"
+                showErrorAlert = true
+                isLoading = false
                 print("Error fetching categories: \(error)")
             }
         }
@@ -52,12 +62,14 @@ final class AddTransactionViewModel: ObservableObject {
         await MainActor.run {
             showErrorAlert = false
             errorMessage = nil
+            isLoading = true
         }
         
         guard let category = selectedCategory else {
             await MainActor.run {
                 showErrorAlert = true
                 errorMessage = "Выберите категорию"
+                isLoading = false
             }
             return false
         }
@@ -66,6 +78,7 @@ final class AddTransactionViewModel: ObservableObject {
             await MainActor.run {
                 showErrorAlert = true
                 errorMessage = "Введите сумму транзакции"
+                isLoading = false
             }
             return false
         }
@@ -83,11 +96,36 @@ final class AddTransactionViewModel: ObservableObject {
                 comment: comment.isEmpty ? nil : comment
             )
             
+            var newBalance = bankAccount.balance
+            switch direction {
+            case .income:
+                newBalance += amount
+            case .outcome:
+                newBalance -= amount
+            }
+            
+            try await bankAccountService.updateAccount(to:
+                BankAccount(
+                    id: bankAccount.id,
+                    userId: bankAccount.userId,
+                    name: bankAccount.name,
+                    balance: newBalance,
+                    currency: bankAccount.currency,
+                    createdAt: bankAccount.createdAt,
+                    updatedAt: bankAccount.updatedAt
+                )
+            )
+            
+            await MainActor.run {
+                isLoading = false
+            }
+            
             return true
         } catch {
             await MainActor.run {
-                errorMessage = "Ошибка при добавлении транзакции :("
+                errorMessage = "Не получилось сохранить транзакцию :("
                 showErrorAlert = true
+                isLoading = false
                 print("Error adding transaction: \(error)")
             }
             return false

@@ -19,13 +19,23 @@ final class BankAccountViewModel: ObservableObject {
         }
     }
     @Published var selectedCurrency: Currency = .ruble
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    @Published var showErrorAlert: Bool = false
+    
     let availableCurrencies = Currency.allCases
     
-    private let bankAccountsService = BankAccountsService()
+    private let bankAccountsService = BankAccountsService.shared
     
     init() {}
 
     func load() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         do {
             let account = try await bankAccountsService.account()
             
@@ -35,13 +45,25 @@ final class BankAccountViewModel: ObservableObject {
                 self.bankAccount = account
                 self.balanceString = account.balance.description
                 self.selectedCurrency = currency
+                
+                self.isLoading = false
             }
         } catch {
+            self.isLoading = false
+            self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+            self.showErrorAlert = true
+            
             print("Error loading bank account: \(error)")
         }
     }
     
     func saveChanges() async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+            showErrorAlert = false
+        }
+        
         guard let bankAccount else {
             print("Error: no bank account")
             return
@@ -66,8 +88,13 @@ final class BankAccountViewModel: ObservableObject {
             
             await MainActor.run {
                 self.bankAccount = updatedAccount
+                self.isLoading = false
             }
         } catch {
+            self.isLoading = false
+            self.errorMessage = "Перезагрузите страницу или попробуйте позже"
+            self.showErrorAlert = true
+            
             print("Error saving changes: \(error)")
         }
     }
