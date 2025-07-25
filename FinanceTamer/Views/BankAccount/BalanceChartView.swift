@@ -80,6 +80,7 @@ struct BalanceChartView: View {
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: period)
         .frame(maxWidth: .infinity, minHeight: 240)
         .padding(.horizontal, 8)
     }
