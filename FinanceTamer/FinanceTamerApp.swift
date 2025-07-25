@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct FinanceTamerApp: App {
+    @State private var isAnimationFinished = false
+    
     var body: some Scene {
         WindowGroup {
-            TabBarView()
+            if isAnimationFinished {
+                TabBarView() 
+            } else {
+                LaunchScreenView(isAnimationFinished: $isAnimationFinished)
+            }
         }
     }
 }

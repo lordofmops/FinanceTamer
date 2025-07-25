@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		15544FCE2E338AE4005A2747 /* PieChart in Frameworks */ = {isa = PBXBuildFile; productRef = 15544FCD2E338AE4005A2747 /* PieChart */; };
+		155FEC672E3438DC0061EE9D /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 155FEC662E3438DC0061EE9D /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				15544FCE2E338AE4005A2747 /* PieChart in Frameworks */,
+				155FEC672E3438DC0061EE9D /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +98,7 @@
 			name = FinanceTamer;
 			packageProductDependencies = (
 				15544FCD2E338AE4005A2747 /* PieChart */,
+				155FEC662E3438DC0061EE9D /* Lottie */,
 			);
 			productName = FinanceTamer;
 			productReference = 159DE14E2DFAC70600955089 /* FinanceTamer.app */;
@@ -155,6 +158,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				15544FCC2E338AE4005A2747 /* XCLocalSwiftPackageReference "FinanceTamer/Utilities" */,
+				155FEC652E3438DC0061EE9D /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 159DE14F2DFAC70600955089 /* Products */;
@@ -477,10 +481,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		155FEC652E3438DC0061EE9D /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		15544FCD2E338AE4005A2747 /* PieChart */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PieChart;
+		};
+		155FEC662E3438DC0061EE9D /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 155FEC652E3438DC0061EE9D /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
