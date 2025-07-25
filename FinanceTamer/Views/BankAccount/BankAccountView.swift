@@ -14,6 +14,7 @@ struct BankAccountView: View {
     @State private var path = NavigationPath()
     @State private var showCurrencyPicker: Bool = false
     @State private var isBalanceHidden: Bool = false
+    @State private var chartPeriod: BankAccountViewModel.Period = .daily
     
     init() {
         _viewModel = StateObject(wrappedValue: BankAccountViewModel())
@@ -83,6 +84,21 @@ struct BankAccountView: View {
                         .listRowBackground(isEditing
                                            ? Color.white
                                            : Color.lightGreen)
+                        
+                        if !isEditing {
+                            Section {
+                                Picker("Период", selection: $chartPeriod) {
+                                    Text("По дням").tag(BankAccountViewModel.Period.daily)
+                                    Text("По месяцам").tag(BankAccountViewModel.Period.monthly)
+                                }
+                                .pickerStyle(.segmented)
+                                
+                                BalanceChartView(points: viewModel.balancePoints(for: chartPeriod), period: chartPeriod)
+                                    .background(Color.background)
+                                    .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                            .listRowBackground(Color.background)
+                        }
                     }
                     .padding(.top, -14)
                     .listSectionSpacing(16)

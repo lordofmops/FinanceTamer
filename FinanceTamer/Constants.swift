@@ -19,4 +19,7 @@ enum Constants {
     static func transactionsByPeriodRoute(accountId: Int) -> String {
         "/transactions/account/\(accountId)/period"
     }
+    static func accountHistoryRoute(accountId: Int) -> String {
+        "/accounts/\(accountId)/history"
+    }
 }
