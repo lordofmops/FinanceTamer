@@ -44,7 +44,6 @@ final class BankAccountViewModel: ObservableObject {
         
         do {
             let calendar = Calendar.current
-            let yearAgo = calendar.date(byAdding: .year, value: -2, to: Date()) ?? Date()
             
             async let loadAccount = bankAccountsService.account()
             async let loadHistory = bankAccountsService.accountModifications()
@@ -113,106 +112,77 @@ final class BankAccountViewModel: ObservableObject {
     }
     
     func balancePoints(for period: Period) -> [BalancePoint] {
+        guard !history.isEmpty else { return [] }
+        
+        let sortedHistory = history.sorted { $0.date < $1.date }
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        
         switch period {
         case .daily:
-            return generateDailyBalancePoints()
+            return generateDailyBalancePoints(history: sortedHistory, today: today)
         case .monthly:
-            return generateMonthlyBalancePoints()
+            return generateMonthlyBalancePoints(history: sortedHistory, today: today)
         }
     }
+
     
     private func filterBalanceString(_ balance: String) -> String {
         return balance.filterBalanceString()
     }
     
-    private func generateDailyBalancePoints() -> [BalancePoint] {
-        guard !history.isEmpty else {
-            return []
-        }
+    private func generateDailyBalancePoints(history: [BankAccountModification], today: Date) -> [BalancePoint] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        
-        var nextIdx = 1
         var points: [BalancePoint] = []
-        points.append(
-            BalancePoint(
-                date: history[0].date,
-                balance: history[0].balance,
-                isPositive: history[0].balance > 0
-            )
-        )
-        for i in 0..<31 {
-            guard nextIdx < history.count else {
-                if points.count < 30 {
-                    let lastPoint = points[points.count - 1]
-                    for i in points.count...30 {
-                        points[i] = lastPoint
-                    }
-                }
-                return points
-            }
-            let date = calendar.date(byAdding: .day, value: i * (-1), to: today)!
+        let daysCount = 31
+        
+        let currentBalance = bankAccount?.balance ?? 0
+        points.append(BalancePoint(
+            date: today,
+            balance: currentBalance,
+            isPositive: currentBalance >= 0
+        ))
+        
+        for dayOffset in 1..<daysCount {
+            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
             
-            if nextIdx < history.count || history[nextIdx].date < date{
-                points.append(
-                    BalancePoint(
-                        date: history[nextIdx - 1].date,
-                        balance: history[nextIdx - 1].balance,
-                        isPositive: history[nextIdx - 1].balance > 0
-                    )
-                )
-            } else {
-                while nextIdx < history.count && history[nextIdx].date >= date {
-                    points.append(
-                        BalancePoint(
-                            date: history[nextIdx].date,
-                            balance: history[nextIdx].balance < 0 ? history[nextIdx].balance * (-1) : history[nextIdx].balance,
-                            isPositive: history[nextIdx].balance > 0
-                        )
-                    )
-                    nextIdx += 1
-                }
-            }
-            print(date)
-            print(points.last!.date, points.last!.balance, "\n")
+            let balance = history.last { $0.date <= date }?.balance ?? 0
+            
+            points.append(BalancePoint(
+                date: date,
+                balance: balance,
+                isPositive: balance >= 0
+            ))
         }
         
         return points.reversed()
     }
     
-    private func generateMonthlyBalancePoints() -> [BalancePoint] {
-        guard !history.isEmpty else { return [] }
-
+    private func generateMonthlyBalancePoints(history: [BankAccountModification], today: Date) -> [BalancePoint] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let twoYearsAgo = calendar.date(byAdding: .year, value: -2, to: today)!
-
         var points: [BalancePoint] = []
-
-        var currentIdx = 0
-        var currentBalance = history.first!.balance
-
-        for monthOffset in 0..<24 {
-            guard let date = calendar.date(byAdding: .month, value: monthOffset, to: twoYearsAgo) else { continue }
-            let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
+        let monthsCount = 24
+        
+        let currentBalance = bankAccount?.balance ?? 0
+        points.append(BalancePoint(
+            date: today,
+            balance: currentBalance,
+            isPositive: currentBalance >= 0
+        ))
+        
+        for monthOffset in 1..<monthsCount {
+            guard let date = calendar.date(byAdding: .month, value: -monthOffset, to: today),
+                  let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: date)) else { continue }
             
-            while currentIdx < history.count && history[currentIdx].date < startOfMonth {
-                currentBalance = history[currentIdx].balance
-                currentIdx += 1
-            }
+            let balance = history.last { $0.date <= startOfMonth }?.balance ?? 0
             
-            let point = BalancePoint(
+            points.append(BalancePoint(
                 date: startOfMonth,
-                balance: currentBalance < 0 ? currentBalance * (-1) : currentBalance,
-                isPositive: currentBalance > 0
-            )
-            
-            points.append(point)
-            
-            print(date)
-            print(point.date, point.balance, "\n")
+                balance: balance,
+                isPositive: balance >= 0
+            ))
         }
-
+        
         return points.reversed()
     }
 }

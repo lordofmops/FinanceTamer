@@ -25,7 +25,9 @@ final class BankAccountsService {
             return accountModifications
         } else {
             do {
-                return try await loadHistory()
+                let history = try await loadHistory()
+                self.accountModifications = history
+                return history
             }
         }
     }
