@@ -58,6 +58,6 @@ final class PieChartCell: UITableViewCell {
             entities.append(Entity(value: restSum, label: "Остальные"))
         }
 
-        chartView.entities = entities
+        chartView.animateToNewData(entities)
     }
 }
