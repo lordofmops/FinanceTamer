@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		15544FCE2E338AE4005A2747 /* PieChart in Frameworks */ = {isa = PBXBuildFile; productRef = 15544FCD2E338AE4005A2747 /* PieChart */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		159DE1892DFB1E6700955089 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -39,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				15544FCE2E338AE4005A2747 /* PieChart in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +95,7 @@
 			);
 			name = FinanceTamer;
 			packageProductDependencies = (
+				15544FCD2E338AE4005A2747 /* PieChart */,
 			);
 			productName = FinanceTamer;
 			productReference = 159DE14E2DFAC70600955089 /* FinanceTamer.app */;
@@ -147,6 +153,9 @@
 			);
 			mainGroup = 159DE1452DFAC70500955089;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				15544FCC2E338AE4005A2747 /* XCLocalSwiftPackageReference "FinanceTamer/Utilities" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 159DE14F2DFAC70600955089 /* Products */;
 			projectDirPath = "";
@@ -460,6 +469,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		15544FCC2E338AE4005A2747 /* XCLocalSwiftPackageReference "FinanceTamer/Utilities" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = FinanceTamer/Utilities;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		15544FCD2E338AE4005A2747 /* PieChart */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PieChart;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 159DE1462DFAC70600955089 /* Project object */;
 }

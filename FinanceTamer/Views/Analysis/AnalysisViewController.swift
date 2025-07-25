@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import Combine
+import PieChart
 
 class AnalysisViewController: UIViewController {
     private let direction: Direction
@@ -20,6 +21,7 @@ class AnalysisViewController: UIViewController {
     private let dateToPicker = CustomDatePickerView()
     private let dateFromPicker = CustomDatePickerView()
     private let activityOverlay = UIActivityIndicatorView(style: .large)
+    private let pieChartView = PieChartView()
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -59,6 +61,7 @@ class AnalysisViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "sumCell")
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "emptyCell")
         tableView.register(TransactionCell.self, forCellReuseIdentifier: TransactionCell.identifier)
+        tableView.register(PieChartCell.self, forCellReuseIdentifier: PieChartCell.identifier)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -152,7 +155,7 @@ class AnalysisViewController: UIViewController {
             .sink { [weak self] show in
                 guard show, let message = self?.viewModel.errorMessage else { return }
                 self?.presentAlert(message: message)
-                self?.viewModel.showErrorAlert = false // сбрасываем флаг
+                self?.viewModel.showErrorAlert = false
             }
             .store(in: &cancellables)
     }
@@ -166,11 +169,18 @@ class AnalysisViewController: UIViewController {
 
 extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 3
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 4 : max(1, viewModel.extendedTransactions.count)
+        switch section {
+        case 0:
+            return 4
+        case 1:
+            return 1
+        default:
+            return max(1, viewModel.extendedTransactions.count)
+        }
     }
     
     func tableView(_ tableView: UITableView, heightOfRowInSection section: Int) -> Int {
@@ -204,6 +214,10 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
             default:
                 fatalError("Unexpected row in section 0")
             }
+        } else if indexPath.section == 1 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: PieChartCell.identifier, for: indexPath) as! PieChartCell
+            cell.configure(with: viewModel.extendedTransactions)
+            return cell
         } else {
             if viewModel.extendedTransactions.isEmpty {
                 let cell = tableView.dequeueReusableCell(withIdentifier: "emptyCell", for: indexPath)
@@ -225,7 +239,7 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
             
-        guard indexPath.section == 1, !viewModel.extendedTransactions.isEmpty else { return }
+        guard indexPath.section == 2, !viewModel.extendedTransactions.isEmpty else { return }
         
         let transaction = viewModel.extendedTransactions[indexPath.row]
         presentEditView(for: transaction)
@@ -311,11 +325,11 @@ extension AnalysisViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == 1 ? "Операции" : nil
+        return section == 2 ? "Операции" : nil
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return section == 0 ? 0 : 40
+        return section == 2 ? 40 : 0
     }
 }
 
