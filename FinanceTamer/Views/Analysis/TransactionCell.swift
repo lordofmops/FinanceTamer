@@ -16,6 +16,7 @@ final class TransactionCell: UITableViewCell {
     private let amountLabel = UILabel()
     private var emojiLabel = UILabel()
     private let percentageLabel = UILabel()
+    private let chevronImageView = UIImageView()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -39,14 +40,20 @@ final class TransactionCell: UITableViewCell {
         commentLabel.textColor = .gray
         amountLabel.font = .systemFont(ofSize: 16, weight: .regular)
         percentageLabel.font = .systemFont(ofSize: 16, weight: .regular)
+        
+        chevronImageView.image = UIImage(systemName: "chevron.right")
+        chevronImageView.tintColor = .lightGray
+        chevronImageView.contentMode = .scaleAspectFit
 
         contentView.addSubview(emojiLabel)
         contentView.addSubview(leftStack)
         contentView.addSubview(rightStack)
+        contentView.addSubview(chevronImageView)
 
         emojiLabel.translatesAutoresizingMaskIntoConstraints = false
         leftStack.translatesAutoresizingMaskIntoConstraints = false
         rightStack.translatesAutoresizingMaskIntoConstraints = false
+        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -56,8 +63,13 @@ final class TransactionCell: UITableViewCell {
             leftStack.centerYAnchor.constraint(equalTo: emojiLabel.centerYAnchor),
             leftStack.trailingAnchor.constraint(lessThanOrEqualTo: rightStack.leadingAnchor, constant: -8),
 
-            rightStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            rightStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            rightStack.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -8),
+            rightStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            
+            chevronImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            chevronImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            chevronImageView.widthAnchor.constraint(equalToConstant: 12),
+            chevronImageView.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
 
